@@ -1,0 +1,1303 @@
+{
+  "paragraphs": [
+    {
+      "text": "%spark\nimport org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\nimport org.apache.spark.sql.types._\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.functions._\nimport spark.implicits._\n\ncase class CallSummaryAPI(\n             call_sid: String,\n             parent_call_sid: String,\n             account_sid: String,\n             parent_account_sid: String,\n             start_time: String,\n             end_time: String,\n             duration: Int,\n             connect_duration: Int,\n             call_type: String,\n             call_state: String,\n             call_direction: String,\n             disconnect_by: String,\n             from: Participant,\n             to: Participant,\n             processing_state: String,\n             pdd_ms: Int,\n             tags: Seq[String],\n             properties: ViProperties,\n             carrier_edge: EdgeInfo,\n             sip_edge: EdgeInfo,\n             client_edge: EdgeInfo,\n             sdk_edge: EdgeInfo\n                     ) extends Serializable\n\ncase class Participant(\n              caller: String,\n              callee: String,\n              carrier: String,\n              connection: String,\n              number_prefix: String,\n              location: Location,\n              city: String,\n              country_code: String,\n              country_subdivision: String,\n              ip_address: String,\n              sdk: TwilioSDK\n                      )\n\ncase class EdgeInfo(\n               properties: ViProperties,\n               metrics: MetricsContainer,\n               tags: Seq[String]\n                   )\n\ncase class TwilioSDK(\n                    sdk_type: String,\n                    version: String,\n                    platform: String,\n                    region: String,\n                    selected_region: String,\n                    browser: Browser,\n                    os: Os\n                    )\n\ncase class Browser(name: String, major: String, version: String)\ncase class Os(name: String, version: String)\n\ncase class ViProperties(\n               last_sip_response_num: Int,\n               pdd_ms: Int,\n               route_id: String,\n               media_region: String,\n               signaling_region: String,\n               twilio_media_ip: String,\n               twilio_signaling_ip: String,\n               external_media_ip: String,\n               external_signaling_ip: String,\n               sip_call_id: String,\n               user_agent: String,\n               selected_region: String,\n               region: String,\n               trunk_sid: String,\n               diconnectedBy: String\n                       )\n\ncase class Location(\n               lat: Float \u003d 0.0f,\n               lon: Float \u003d 0.0f\n                   )\n\ncase class MetricsContainer(\n               inbound: Metric,\n               outbound: Metric\n                           )\n\ncase class Metric(\n                 codec_name: String,\n                 packets_received: Float,\n                 packets_sent: Float,\n                 packets_lost: Float,\n                 packets_loss_percentage: Float,\n                 jitter: Stats,\n                 rtt: Stats,\n                 mos: Stats,\n                 audio_in: Stats,\n                 audio_out: Stats,\n                 latency: Stats,\n                 codec: Int,\n                 packet_delay_variation: PacketDelayVariation\n                 )\n\ncase class Stats(\n                min: Float,\n                max: Float,\n                avg: Float\n                )\n\ncase class PacketDelayVariation(\n                d50: Int,\n                d70: Int,\n                d90: Int,\n                d120: Int,\n                d150: Int,\n                d200: Int,\n                d300: Int)\n             \nval callSummary: Encoder[CallSummaryAPI] \u003d Encoders.product[CallSummaryAPI]\nval schema \u003d callSummary.schema\nval df \u003d spark.read.schema(schema).parquet(\"hdfs://namenode:8020/voiceinsights/signal2019/data/signal-call-summary-small.parquet\")\nval table \u003d df.createOrReplaceTempView(\"calls_api_v2\")\n// Total Rows\nval totalRows \u003d spark.sql(\"select count(call_sid) from calls_api_v2\")\ntotalRows.show(false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 17:58:18.990",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d0"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610712429_699347112",
+      "id": "20190731-220512_955899032",
+      "dateCreated": "2019-07-31 22:05:12.429",
+      "dateStarted": "2019-08-04 17:58:19.169",
+      "dateFinished": "2019-08-04 17:59:17.031",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# Business Intelligence Use Cases\n * Query to/from number_prefix, country_code \u0026 last_sip_response_num\n * Group By to/from number_prefix, country_code\n * Create a temporary view \"model_dataset\"",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:02:02.907",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610917835_1602513714",
+      "id": "20190731-220837_191322751",
+      "dateCreated": "2019-07-31 22:08:37.836",
+      "dateStarted": "2019-08-04 18:02:02.929",
+      "dateFinished": "2019-08-04 18:02:07.146",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval modelDataset \u003d spark.sql(\"SELECT from.number_prefix as caller_number_prefix, \" + \n                             \" from.country_code as caller_country_code,\" + \n                             \" to.country_code as callee_country_code, \" + \n                             \" to.number_prefix as callee_number_prefix, \" + \n                             \" properties.last_sip_response_num as last_sip_response, \" + \n                             \" count(properties.last_sip_response_num) as counts \" +\n                             \" FROM calls_api_v2 \" + \n                             \" WHERE carrier_edge IS NOT NULL \" + \n                             \" GROUP BY caller_number_prefix, \" + \n                             \" caller_country_code, \" + \n                             \" callee_country_code, \" + \n                             \" callee_number_prefix, \" + \n                             \" last_sip_response \" + \n                             \" ORDER BY counts desc\")\nmodelDataset.createOrReplaceTempView(\"model_dataset\")\nmodelDataset.show(100, false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:39:41.163",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d71"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610819620_497173923",
+      "id": "20190731-220659_451149788",
+      "dateCreated": "2019-07-31 22:06:59.620",
+      "dateStarted": "2019-08-04 19:39:41.280",
+      "dateFinished": "2019-08-04 19:39:50.592",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from model_dataset",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:02:34.336",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "caller_number_prefix": "string",
+                      "caller_country_code": "string",
+                      "callee_country_code": "string",
+                      "callee_number_prefix": "string",
+                      "last_sip_response": "string",
+                      "counts": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "scatterChart": {
+                  "xAxis": {
+                    "name": "caller_number_prefix",
+                    "index": 0.0,
+                    "aggr": "sum"
+                  },
+                  "yAxis": {
+                    "name": "last_sip_response",
+                    "index": 4.0,
+                    "aggr": "sum"
+                  },
+                  "size": {
+                    "name": "counts",
+                    "index": 5.0,
+                    "aggr": "sum"
+                  },
+                  "group": {
+                    "name": "callee_number_prefix",
+                    "index": 3.0,
+                    "aggr": "sum"
+                  }
+                }
+              }
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d2"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610875158_2091753034",
+      "id": "20190731-220755_56882244",
+      "dateCreated": "2019-07-31 22:07:55.161",
+      "dateStarted": "2019-08-04 18:02:34.454",
+      "dateFinished": "2019-08-04 18:02:44.408",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval rows \u003d spark.sql(\"SELECT call_sid,\" + \n                     \" account_sid,  \" + \n                     \" parent_account_sid, \" + \n                     \" start_time, \" + \n                     \" end_time, \" + \n                     \" from.caller, \" + \n                     \" from.carrier as caller_carrier, \" + \n                     \" from.number_prefix as caller_number_prefix, \" + \n                     \" to.callee, \" + \n                     \" to.carrier as callee_carrier, \" + \n                     \" to.number_prefix as callee_number_prefix, \" + \n                     \" properties.last_sip_response_num as sip_response, \" + \n                     \" tags, connect_duration, \" + \n                     \" pdd_ms, \" + \n                     \" call_state \" + \n                     \" FROM calls_api_v2\")\n    .withColumn(\"end_time\", to_timestamp(col(\"end_time\")))\n    .withColumn(\"year\", year(col(\"end_time\")))\n    .withColumn(\"month\", month(col(\"end_time\")))\n    .withColumn(\"day\", dayofmonth(col(\"end_time\")))\n    .withColumn(\"hour\", hour(col(\"end_time\")))\n    .cache \nrows.createOrReplaceTempView(\"call_summaries\")\nrows.show(false)\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:41:25.996",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d72"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610906792_-1088268485",
+      "id": "20190731-220826_1166786147",
+      "dateCreated": "2019-07-31 22:08:26.792",
+      "dateStarted": "2019-08-04 19:41:26.105",
+      "dateFinished": "2019-08-04 19:41:26.774",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nSELECT from.number_prefix as caller_number_prefix,\n       to.number_prefix as callee_number_prefix, \n       properties.last_sip_response_num as last_sip_response, \n       count(properties.last_sip_response_num) as counts \nFROM calls_api_v2 \nWHERE carrier_edge IS NOT NULL\nGROUP BY caller_number_prefix, callee_number_prefix,  last_sip_response\nORDER BY counts desc",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:42:30.721",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "caller_number_prefix": "string",
+                      "callee_number_prefix": "string",
+                      "last_sip_response": "string",
+                      "counts": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "scatterChart": {
+                  "xAxis": {
+                    "name": "caller_number_prefix",
+                    "index": 0.0,
+                    "aggr": "sum"
+                  },
+                  "yAxis": {
+                    "name": "callee_number_prefix",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  },
+                  "group": {
+                    "name": "last_sip_response",
+                    "index": 2.0,
+                    "aggr": "sum"
+                  },
+                  "size": {
+                    "name": "counts",
+                    "index": 3.0,
+                    "aggr": "sum"
+                  }
+                }
+              }
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d73"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564612566257_-1528371121",
+      "id": "20190731-223606_267888563",
+      "dateCreated": "2019-07-31 22:36:06.257",
+      "dateStarted": "2019-08-04 19:42:30.778",
+      "dateFinished": "2019-08-04 19:42:37.830",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Calls With Tag Silence",
+      "text": "%sql\nSELECT count(call_sid) as calls, account_sid, day\nFROM call_summaries \nWHERE array_contains(tags, \"silence\") \nAND account_sid\u003d\"ACk6326n554mk3m79l9842799991op5l31\"\nGROUP BY account_sid, day \nORDER BY calls desc\nLIMIT 15",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:52:55.596",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "calls": "string",
+                      "account_sid": "string",
+                      "day": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "pieChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "day",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "calls",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d74"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564613594998_1226187383",
+      "id": "20190731-225314_568428473",
+      "dateCreated": "2019-07-31 22:53:14.998",
+      "dateStarted": "2019-08-04 19:43:02.791",
+      "dateFinished": "2019-08-04 19:43:06.856",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Noanswer Calls",
+      "text": "%sql\nSELECT count(call_sid) calls, account_sid \nFROM call_summaries \nWHERE call_state \u003d\u003d \"noanswer\"  \nGROUP BY  account_sid \nORDER BY calls",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:44:11.090",
+      "config": {
+        "colWidth": 4.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "calls": "string",
+                      "account_sid": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          },
+          "1": {
+            "graph": {
+              "mode": "table",
+              "height": 86.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d75"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564613714574_-1169433283",
+      "id": "20190731-225514_329434174",
+      "dateCreated": "2019-07-31 22:55:14.575",
+      "dateStarted": "2019-08-04 19:44:11.193",
+      "dateFinished": "2019-08-04 19:44:15.948",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Busy Calls",
+      "text": "%sql\nSELECT count(call_sid) calls, account_sid \nFROM call_summaries \nWHERE call_state \u003d\u003d \"busy\"  \nGROUP BY  account_sid \nORDER BY calls",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:44:05.923",
+      "config": {
+        "colWidth": 4.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 296.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "calls": "string",
+                      "account_sid": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          },
+          "1": {
+            "graph": {
+              "mode": "table",
+              "height": 86.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d11",
+            "http://zeppelin:4040/jobs/job?id\u003d12"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564613768485_408453592",
+      "id": "20190731-225608_1787501911",
+      "dateCreated": "2019-07-31 22:56:08.485",
+      "dateStarted": "2019-08-04 18:08:07.849",
+      "dateFinished": "2019-08-04 18:08:20.456",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Failed Calls",
+      "text": "%sql\nSELECT count(call_sid) calls, account_sid \nFROM call_summaries \nWHERE call_state \u003d\u003d \"fail\"  \nGROUP BY  account_sid \nORDER BY calls",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:44:10.996",
+      "config": {
+        "colWidth": 4.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 296.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "calls": "string",
+                      "account_sid": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            },
+            "helium": {}
+          },
+          "1": {
+            "graph": {
+              "mode": "table",
+              "height": 86.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d13"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564613760379_2017175518",
+      "id": "20190731-225600_1334364212",
+      "dateCreated": "2019-07-31 22:56:00.379",
+      "dateStarted": "2019-08-04 18:08:29.099",
+      "dateFinished": "2019-08-04 18:08:32.823",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# Call Summary Aggregation\n   * Total Calls\n   * Avg Connect Duration\n   * Avg Post Dial Delay\n   * Create Another Temp View \"call_summary_aggregate\"\n   * Stacked graph AvgConnectDuration over AvgPddMs",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:08:36.090",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564614406099_-1345556757",
+      "id": "20190731-230646_465797031",
+      "dateCreated": "2019-07-31 23:06:46.099",
+      "dateStarted": "2019-08-04 18:08:36.094",
+      "dateFinished": "2019-08-04 18:08:36.162",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\n rows.groupBy($\"account_sid\")\n     .agg(\n        count(\"call_sid\") as (\"calls\"),\n        avg(\"connect_duration\") as (\"avg_connect_duration\"),\n        avg(\"pdd_ms\") as (\"avg_pdd_ms\")\n        )\n        .orderBy(desc(\"calls\"))\n        .createOrReplaceTempView(\"call_summary_aggregate\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:08:38.838",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564613850496_-2140153193",
+      "id": "20190731-225730_178276847",
+      "dateCreated": "2019-07-31 22:57:30.496",
+      "dateStarted": "2019-08-04 18:08:38.927",
+      "dateFinished": "2019-08-04 18:08:40.709",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from call_summary_aggregate ORDER BY calls desc LIMIT 5",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:52:55.358",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "account_sid": "string",
+                      "calls": "string",
+                      "avg_connect_duration": "string",
+                      "avg_pdd_ms": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "account_sid",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "avg_connect_duration",
+                  "index": 2.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "avg_pdd_ms",
+                  "index": 3.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d16"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564614228922_-131788884",
+      "id": "20190731-230348_1316914807",
+      "dateCreated": "2019-07-31 23:03:48.922",
+      "dateStarted": "2019-08-04 18:09:38.150",
+      "dateFinished": "2019-08-04 18:09:41.706",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# Client Projection\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:43:22.432",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564944189741_1655303350",
+      "id": "20190804-184309_1386032154",
+      "dateCreated": "2019-08-04 18:43:09.741",
+      "dateStarted": "2019-08-04 18:43:22.436",
+      "dateFinished": "2019-08-04 18:43:22.513",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Client Projection",
+      "text": "%spark\nval clientProjection \u003d spark.sql(\"select * from calls_api_v2 where (to IS NOT NULL AND to.sdk IS NOT NULL) OR (from IS NOT NULL OR from.sdk IS NOT NULL)\")\nclientProjection.createOrReplaceTempView(\"client_projection\")\nclientProjection.show(false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:43:03.459",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d63"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564897350356_-1515733227",
+      "id": "20190804-054230_1602198727",
+      "dateCreated": "2019-08-04 05:42:30.356",
+      "dateStarted": "2019-08-04 18:43:03.547",
+      "dateFinished": "2019-08-04 18:43:05.628",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval client_metric_projection \u003d spark.sql(\"select from.sdk.version as twilio_sdk_version, \" +\n                                         \"from.sdk.platform as twilio_platform, \"  +\n                                         \"from.sdk.browser.name as from_browser, \"  +\n                                         \"from.sdk.browser.major as from_browser_major, \" + \n                                         \"sdk_edge.metrics.inbound.jitter.avg as inbound_avg_jitter, \" +\n                                         \"sdk_edge.metrics.outbound.jitter.avg as outbound_avg_jitter \"  +\n                                         \"FROM client_projection \" +  \n                                         \"WHERE from IS NOT NULL AND from.sdk IS NOT NULL\")\nclient_metric_projection.show(false)\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:44:37.778",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d65"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564943678703_31450716",
+      "id": "20190804-183438_892159211",
+      "dateCreated": "2019-08-04 18:34:38.704",
+      "dateStarted": "2019-08-04 18:44:37.842",
+      "dateFinished": "2019-08-04 18:44:38.965",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect avg(inbound_avg_jitter) as avg_inbound_jitter,\n       avg(outbound_avg_jitter) as avg_outbound_jitter ,\n       twilio_platform,\n       twilio_sdk_version\n       from client_metric_projection \n       where twilio_platform IS NOT NULL\n       group by twilio_platform, twilio_sdk_version",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 19:52:55.426",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "avg_inbound_jitter": "string",
+                      "avg_outbound_jitter": "string",
+                      "twilio_platform": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "twilio_platform",
+                  "index": 2.0,
+                  "aggr": "sum"
+                },
+                {
+                  "name": "twilio_sdk_version",
+                  "index": 3.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "avg_inbound_jitter",
+                  "index": 0.0,
+                  "aggr": "avg"
+                },
+                {
+                  "name": "avg_outbound_jitter",
+                  "index": 1.0,
+                  "aggr": "avg"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d66",
+            "http://zeppelin:4040/jobs/job?id\u003d67",
+            "http://zeppelin:4040/jobs/job?id\u003d68",
+            "http://zeppelin:4040/jobs/job?id\u003d69",
+            "http://zeppelin:4040/jobs/job?id\u003d70"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564942428927_-745993563",
+      "id": "20190804-181348_2067950241",
+      "dateCreated": "2019-08-04 18:13:48.927",
+      "dateStarted": "2019-08-04 18:45:04.075",
+      "dateFinished": "2019-08-04 18:45:09.008",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# SIP Projection\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:43:37.813",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564943063665_490459396",
+      "id": "20190804-182423_1229994668",
+      "dateCreated": "2019-08-04 18:24:23.665",
+      "dateStarted": "2019-08-04 18:43:37.822",
+      "dateFinished": "2019-08-04 18:43:37.871",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval sipProjection \u003d spark.sql(\"select * from calls_api_v2 where sip_edge IS NOT NULL\")\nsipProjection.createOrReplaceTempView(\"sip_projection\")\nsipProjection.show(false)\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 18:44:20.503",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d64"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564944217739_1950711690",
+      "id": "20190804-184337_1620501950",
+      "dateCreated": "2019-08-04 18:43:37.739",
+      "dateStarted": "2019-08-04 18:44:20.555",
+      "dateFinished": "2019-08-04 18:44:22.511",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect sip_edge.properties.* from sip_projection\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 20:04:04.553",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "last_sip_response_num": "string",
+                      "pdd_ms": "string",
+                      "route_id": "string",
+                      "media_region": "string",
+                      "signaling_region": "string",
+                      "twilio_media_ip": "string",
+                      "twilio_signaling_ip": "string",
+                      "external_media_ip": "string",
+                      "external_signaling_ip": "string",
+                      "sip_call_id": "string",
+                      "user_agent": "string",
+                      "selected_region": "string",
+                      "region": "string",
+                      "trunk_sid": "string",
+                      "diconnectedBy": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "last_sip_response_num\tpdd_ms\troute_id\tmedia_region\tsignaling_region\ttwilio_media_ip\ttwilio_signaling_ip\texternal_media_ip\texternal_signaling_ip\tsip_call_id\tuser_agent\tselected_region\tregion\ttrunk_sid\tdiconnectedBy\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t205\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t204\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t170\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t64\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t194\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t212\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t176\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t190\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t69\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t198\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t44\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t95\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t221\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t326\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t208\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t98\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t163\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t168\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t208\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t256\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t72\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t163\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t167\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t188\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t189\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t228\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t59\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t44\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t87\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t312\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t210\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t89\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t187\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t220\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t189\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t195\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t208\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t236\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t46\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t91\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t239\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t187\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t216\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t46\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t229\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t176\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t225\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n500\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t74\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t236\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t243\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t298\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t204\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t45\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t216\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t202\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t234\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t166\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t243\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t182\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t167\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n477\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t112\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t111\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t324\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t194\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t239\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t218\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t203\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t84\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t197\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t86\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t200\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t185\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t44\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t184\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t324\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t238\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t188\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t60\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t71\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t194\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t245\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t46\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t193\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t185\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t190\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t215\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t249\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t281\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t207\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t71\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t246\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t194\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t215\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t266\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t193\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t69\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t219\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t210\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n477\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t112\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t123\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t195\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t233\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t171\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t313\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t187\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t214\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t129\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t185\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t215\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t204\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t223\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t226\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t60\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t200\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t191\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t285\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t200\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t317\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t209\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t59\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t202\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t76\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t223\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t267\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t221\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t314\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t164\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t64\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t193\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t46\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t173\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t44\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t193\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t199\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t189\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t165\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t198\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t43\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t88\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t167\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t200\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t167\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t59\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t45\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t163\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t45\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t189\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t317\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t271\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t165\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t322\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t242\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t241\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t171\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t190\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t228\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t318\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t303\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t46\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t247\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t186\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n603\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t238\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t186\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t70\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t218\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t60\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t184\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t220\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t64\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t45\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t203\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t195\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t163\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t45\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t43\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t214\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t211\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n481\t197\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t182\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t326\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t165\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t187\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t213\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t45\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t217\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t319\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t82\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t168\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t242\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t181\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t60\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t139\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t199\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t107\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t215\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t202\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t181\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n603\t87\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t186\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t199\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t215\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t218\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t190\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t219\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t59\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t191\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t200\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t344\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t223\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t77\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t73\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t97\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t231\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t190\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t113\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t205\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t125\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t181\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t200\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t189\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t190\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t60\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t191\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t312\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t86\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t243\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t214\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t244\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t38\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t193\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t64\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t82\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t75\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t395\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t212\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t64\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t91\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t181\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t176\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t316\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t175\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t74\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t205\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t203\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n500\t202\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t106\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t210\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t314\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t189\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t166\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t181\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t176\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t272\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t124\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t183\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t182\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t247\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t315\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t184\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t197\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t217\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t196\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t202\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t186\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t193\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t81\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t213\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t181\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t52\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t240\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t109\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t175\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t172\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t215\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t194\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t217\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t186\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t45\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t228\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t218\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t209\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t208\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t65\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t182\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t82\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t240\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t188\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t315\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t64\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t96\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t248\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t252\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t215\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t242\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t192\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t164\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t118\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t184\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t230\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t189\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t67\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n477\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t166\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t224\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t175\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t314\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t227\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t190\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t204\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t119\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t212\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t59\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t323\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t186\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t48\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t59\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t213\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t60\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t68\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t70\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t120\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n603\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t184\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t102\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t229\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t217\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t72\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t187\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t203\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t262\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t214\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t56\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t59\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t61\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t195\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t187\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t230\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t386\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t201\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t250\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t217\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t90\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t165\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t63\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t57\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t54\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n408\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n486\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t104\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t122\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t51\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t178\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t177\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t62\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t195\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t71\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t0\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n487\t169\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t322\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t296\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t293\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t65\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t284\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t55\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t50\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t92\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t179\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t186\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t49\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t75\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n603\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t58\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t172\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t47\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t199\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t265\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t44\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t53\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t174\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t262\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t184\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t180\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t46\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t124\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t202\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\t\tus1\tunknown_realm\t\tunknown_disconnected_by\n200\t46\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by\n404\t44\t\tus1\tus1\t198.162.100.1\t198.162.100.2\t198.162.240.1\t198.162.240.2\t\tAsterisk PBX UNKNOWN__and_probably_unsupported\tus1\tunknown_realm\t\tunknown_disconnected_by"
+          },
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"result-alert alert-warning\" role\u003d\"alert\"\u003e\u003cbutton type\u003d\"button\" class\u003d\"close\" data-dismiss\u003d\"alert\" aria-label\u003d\"Close\"\u003e\u003cspan aria-hidden\u003d\"true\"\u003e\u0026times;\u003c/span\u003e\u003c/button\u003e\u003cstrong\u003eOutput is truncated\u003c/strong\u003e to 102400 bytes. Learn more about \u003cstrong\u003eZEPPELIN_INTERPRETER_OUTPUT_LIMIT\u003c/strong\u003e\u003c/div\u003e"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d77"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564944260503_622054543",
+      "id": "20190804-184420_1522893978",
+      "dateCreated": "2019-08-04 18:44:20.504",
+      "dateStarted": "2019-08-04 20:04:02.891",
+      "dateFinished": "2019-08-04 20:04:04.360",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-04 20:02:31.713",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564948951712_-1181625515",
+      "id": "20190804-200231_1335882753",
+      "dateCreated": "2019-08-04 20:02:31.712",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "Signal2019/3_BusinessIntelligence",
+  "id": "2EKN8NAYV",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {
+    "md:shared_process": [],
+    "spark:shared_process": []
+  },
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

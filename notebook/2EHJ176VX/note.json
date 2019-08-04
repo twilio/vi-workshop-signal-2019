@@ -1,0 +1,475 @@
+{
+  "paragraphs": [
+    {
+      "text": "%spark\nimport org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\nimport org.apache.spark.sql.types._\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.functions._\nimport spark.implicits._\n\n@SerialVersionUID(100L)\ncase class CallSummaryAPI (\n            call_sid             : String,\n            parent_call_sid      : String,\n            account_sid          : String,\n            parent_account_sid   : String,\n            start_time           : String,\n            end_time             : String,\n            duration             : Int,\n            connect_duration     : Int,\n            call_type            : String,\n            call_state           : String,\n            call_direction       : String,\n            disconnect_by        : String,\n            from                 : Participant,\n            to                   : Participant,\n            processing_state     : String,\n            pdd_ms               : Int,\n            tags                 : Seq[String],\n            properties           : ViProperties,\n            carrier_edge         : EdgeInfo,\n            sip_edge             : EdgeInfo,\n            client_edge          : EdgeInfo,\n            sdk_edge             : EdgeInfo\n        ) extends Serializable\n\n@SerialVersionUID(100L)\ncase class Participant (\n           caller                : String,\n           callee                : String,\n           carrier               : String,\n           connection            : String,\n           number_prefix         : String,\n           location              : Location,\n           city                  : String,\n           country_code          : String,\n           country_subdivision   : String,\n           ip_address            : String\n       )\n\n@SerialVersionUID(100L)\ncase class EdgeInfo (\n            properties            : ViProperties,\n            metrics               : MetricsContainer,\n            tags                  : Seq[String]\n        )\n\ncase class ViProperties (\n            last_sip_response_num  : Int,\n            pdd_ms                 : Int,\n            route_id               : String,\n            media_region           : String,\n            signaling_region       : String,\n            twilio_media_ip        : String,\n            twilio_signaling_ip    : String,\n            external_media_ip      : String,\n            external_signaling_ip  : String,\n            sip_call_id            : String,\n            user_agent             : String,\n            selected_region        : String,\n            region                 : String,\n            trunk_sid              : String,\n            diconnectedBy          : String\n        )\n\ncase class Location (\n            lat          : Float \u003d 0.0f,\n            lon          : Float \u003d 0.0f\n        )\n\ncase class MetricsContainer (\n            inbound               : Metric,\n            outbound              : Metric\n        )\n\ncase class Metric (\n            codec_name              : String,\n            packets_received        : Float,\n            packets_sent            : Float,\n            packets_lost            : Float,\n            packets_loss_percentage : Float,\n            jitter                  : Stats,\n            rtt                     : Stats,\n            mos                     : Stats,\n            audio_in                : Stats,\n            audio_out               : Stats,\n            latency                 : Stats,\n            codec                   : Int,\n            packet_delay_variation  : PacketDelayVariation\n        )\n\ncase class Stats (\n            min                     : Float,\n            max                     : Float,\n            avg                     : Float\n        )\n\ncase class PacketDelayVariation (\n            d50                     : Int,\n            d70                     : Int,\n            d90                     : Int,\n            d120                    : Int,\n            d150                    : Int,\n            d200                    : Int,\n            d300                    : Int\n         )\n             \nval callSummary: Encoder[CallSummaryAPI] \u003d Encoders.product[CallSummaryAPI]\nval schema \u003d callSummary.schema\nval df \u003d spark.read.schema(schema).parquet(\"hdfs://namenode:8020/voiceinsights/signal2019/data/signal-call-summary-data-xs.parquet\")\nval table \u003d df.createOrReplaceTempView(\"calls_api_v2\")\n// Total Rows\nval totalRows \u003d spark.sql(\"select count(call_sid) from calls_api_v2\")\ntotalRows.show(false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:09:42.705",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9.0,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+---------------+\n|count(call_sid)|\n+---------------+\n|10000          |\n+---------------+\n\nimport org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\nimport org.apache.spark.sql.types._\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.functions._\nimport spark.implicits._\ndefined class CallSummaryAPI\ndefined class Participant\ndefined class EdgeInfo\ndefined class ViProperties\ndefined class Location\ndefined class MetricsContainer\ndefined class Metric\ndefined class Stats\ndefined class PacketDelayVariation\ncallSummary: org.apache.spark.sql.Encoder[CallSummaryAPI] \u003d class[call_sid[0]: string, parent_call_sid[0]: string, account_sid[0]: string, parent_account_sid[0]: string, start_time[0]: string, end_time[0]: string, duration[0]: int, connect_duration[0]: int, call_type[0]: string, call_state[0]: string, call_direction[0]: string, disconnect_b..."
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564615445726_-1312732041",
+      "id": "20190731-220512_955899032",
+      "dateCreated": "2019-07-31 23:24:05.726",
+      "dateStarted": "2019-08-01 00:09:42.735",
+      "dateFinished": "2019-08-01 00:09:47.546",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval rows \u003d spark.sql(\"select call_sid, account_sid, parent_account_sid, start_time, end_time, from.caller, from.carrier as caller_carrier, from.number_prefix as caller_number_prefix, to.callee, to.carrier as callee_carrier, to.number_prefix as callee_number_prefix, properties.last_sip_response_num as sip_response, tags, connect_duration, pdd_ms, call_state from calls_api_v2\")\n    .withColumn(\"end_time\", to_timestamp(col(\"end_time\")))\n    .withColumn(\"year\", year(col(\"end_time\")))\n    .withColumn(\"month\", month(col(\"end_time\")))\n    .withColumn(\"day\", dayofmonth(col(\"end_time\")))\n    .withColumn(\"hour\", hour(col(\"end_time\")))\n    .cache \nrows.createOrReplaceTempView(\"call_summaries\")\nrows.show(false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:09:52.044",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------------------------------+----------------------------------+----------------------------------+--------------------+-------------------+------------+------------------------------------------+--------------------+------------+---------------------------+--------------------+------------+---------+----------------+------+----------+----+-----+---+----+\n|call_sid                          |account_sid                       |parent_account_sid                |start_time          |end_time           |caller      |caller_carrier                            |caller_number_prefix|callee      |callee_carrier             |callee_number_prefix|sip_response|tags     |connect_duration|pdd_ms|call_state|year|month|day|hour|\n+----------------------------------+----------------------------------+----------------------------------+--------------------+-------------------+------------+------------------------------------------+--------------------+------------+---------------------------+--------------------+------------+---------+----------------+------+----------+----+-----+---+----+\n|CA8c4ff581136978e387d76a53ea2bb10a|ACo32nop9p5m636klmk9m9pppm981n9n88|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:18:12Z|2019-07-28 20:19:13|+16007008000|O1 Communications                         |1818                |+17005002000|                           |1201                |200         |[silence]|6100            |91    |completed |2019|7    |28 |20  |\n|CA13d3c96aa022373d9245248d6eeb11a0|ACo32nop9p5m636klmk9m9pppm981n9n88|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:18:14Z|2019-07-28 20:19:15|+16007008000|T-Mobile USA, Inc. (form. Metro PCS, Inc.)|1205                |+17005002000|Onvoy, LLC                 |1205                |200         |[silence]|6100            |78    |completed |2019|7    |28 |20  |\n|CAe5d2a4afdf671797ce5fdefae1d4d14a|ACol66m9pl4n3o27n489k1k7n3ppn64719|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:19:45Z|2019-07-28 20:19:45|+16007008000|T-Mobile USA, Inc.                        |1201                |+17005002000|                           |1201                |603         |[]       |0               |80    |completed |2019|7    |28 |20  |\n|CAf14e0fe6204e4ece9f294b526118cbab|ACol66m9pl4n3o27n489k1k7n3ppn64719|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:19:22Z|2019-07-28 20:19:46|+16007008000|Verizon                                   |1201                |+17005002000|Level 3 Communications, LLC|1201                |200         |[]       |2400            |96    |completed |2019|7    |28 |20  |\n|CAa716c7e1effc7311c85069df6dfe070c|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:19:41Z|2019-07-28 20:19:47|+16007008000|Sprint Spectrum, L.P.                     |1201                |+17005002000|                           |                    |200         |[]       |600             |184   |completed |2019|7    |28 |20  |\n|CA616765f5270cce2fb29398a731b5e415|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:19:11Z|2019-07-28 20:19:56|+16007008000|                                          |1201                |+17005002000|AT\u0026T Wireless              |1201                |200         |[silence]|4500            |76    |completed |2019|7    |28 |20  |\n|CA4937a423f1e11d1ee142d81a1dbbf48e|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:19:31Z|2019-07-28 20:20:01|+16007008000|Hawaiian Telcom, Inc. - HI                |1808                |+17005002000|                           |1201                |200         |[]       |3000            |103   |completed |2019|7    |28 |20  |\n|CA4abdb8a956d7edb0cf0445ea970b529f|AC999m21l79mlpnk9p78388p8n9p5549m9|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:10Z|2019-07-28 20:20:10|+16007008000|                                          |                    |+17005002000|                           |                    |600         |[]       |0               |22    |busy      |2019|7    |28 |20  |\n|CAca035dc61300c585516391f50301ec31|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:19:57Z|2019-07-28 20:20:20|+16007008000|                                          |                    |+17005002000|                           |                    |200         |[]       |2300            |80    |completed |2019|7    |28 |20  |\n|CA971b4d7c5061b23b50a4730b85dc6482|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:17Z|2019-07-28 20:20:23|+16007008000|                                          |                    |+17005002000|                           |                    |200         |[]       |600             |51    |completed |2019|7    |28 |20  |\n|CA523cab2d69c36c398eeecbf657d4b764|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:18Z|2019-07-28 20:20:29|+16007008000|                                          |                    |+17005002000|                           |                    |200         |[]       |1100            |49    |completed |2019|7    |28 |20  |\n|CA8638749d62521b417d7250878851e4ff|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:10Z|2019-07-28 20:20:37|+16007008000|                                          |1201                |+17005002000|                           |1201                |200         |[silence]|2700            |114   |completed |2019|7    |28 |20  |\n|CA70680d5ae5e4c96915809486ae71eca7|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:38Z|2019-07-28 20:20:44|+16007008000|                                          |1201                |+17005002000|                           |1201                |200         |[]       |600             |84    |completed |2019|7    |28 |20  |\n|CA9d8dc59739cc90bec5005999619c482f|ACol66m9pl4n3o27n489k1k7n3ppn64719|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:15Z|2019-07-28 20:20:45|+16007008000|AT\u0026T Wireless                             |1818                |+17005002000|T-Mobile USA, Inc.         |1201                |200         |[silence]|3000            |91    |completed |2019|7    |28 |20  |\n|CA2960750cb45aae5bd39675d87f577df5|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:37Z|2019-07-28 20:20:54|+16007008000|Hawaiian Telcom, Inc. - HI                |1808                |+17005002000|                           |                    |200         |[]       |1700            |182   |completed |2019|7    |28 |20  |\n|CA62a6234f5ef662f77b3cbefc9889d4de|ACol66m9pl4n3o27n489k1k7n3ppn64719|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:55Z|2019-07-28 20:20:55|+16007008000|                                          |                    |+17005002000|                           |                    |0           |[]       |0               |0     |noanswer  |2019|7    |28 |20  |\n|CA12235aa93c9aab43a6300aa33af43238|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:54Z|2019-07-28 20:20:55|+16007008000|T-Mobile USA, Inc.                        |1205                |+17005002000|                           |                    |200         |[]       |100             |186   |completed |2019|7    |28 |20  |\n|CA8f94299173b7089a70d7bc3a3da659f4|ACol66m9pl4n3o27n489k1k7n3ppn64719|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:54Z|2019-07-28 20:20:55|+16007008000|Verizon                                   |1201                |+17005002000|Verizon                    |1201                |200         |[]       |100             |86    |completed |2019|7    |28 |20  |\n|CAa13befe0bb4aabc47b27106fa29f2cce|AC2k999m28noo26n81mm771ml84569lpmo|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:58Z|2019-07-28 20:20:58|+16007008000|                                          |1201                |+17005002000|                           |                    |500         |[]       |0               |184   |fail      |2019|7    |28 |20  |\n|CAedc200af84588b4848814fb0f0b4fcaf|AC9po3p85k475o1832lm514o9244m45np8|AC0ppppppppppppppppppppppppppppppp|2019-07-28T20:20:58Z|2019-07-28 20:20:59|+16007008000|                                          |                    |null        |null                       |null                |200         |[silence]|100             |40    |completed |2019|7    |28 |20  |\n+----------------------------------+----------------------------------+----------------------------------+--------------------+-------------------+------------+------------------------------------------+--------------------+------------+---------------------------+--------------------+------------+---------+----------------+------+----------+----+-----+---+----+\nonly showing top 20 rows\n\nrows: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [call_sid: string, account_sid: string ... 18 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564617993987_-1921892435",
+      "id": "20190801-000633_1931292633",
+      "dateCreated": "2019-08-01 00:06:33.987",
+      "dateStarted": "2019-08-01 00:09:52.089",
+      "dateFinished": "2019-08-01 00:09:52.997",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval watcher \u003d df.groupBy($\"account_sid\", $\"call_state\",  $\"sip_response\", $\"day\", $\"hour\", window(col(\"end_time\"), \"1 hour\"))\nval watcherAggregation \u003d rows.rollup($\"account_sid\", $\"sip_response\", $\"hour\", window(col(\"end_time\"), \"1 hour\"))\n                             .agg(\n                                 count(\"call_sid\").alias(\"calls\"),\n                                 avg(\"connect_duration\").alias(\"avg_connect_duration\"),\n                                 avg(\"pdd_ms\").alias(\"avg_pdd_ms\"),\n                                 min(\"end_time\").alias(\"min_end_time\"),\n                                 max(\"end_time\").alias(\"max_end_time\")\n                                 )\n                                 .orderBy(asc(\"window\"))\n                             \n                             \nval windowData \u003d watcherAggregation.where($\"account_sid\".isNotNull).where($\"window\".isNotNull)\nwindowData.createOrReplaceTempView(\"per_hour_report\")\nwindowData.show(false)  ",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:11:13.788",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------------------------------+------------+----+------------------------------------------+-----+--------------------+------------------+-------------------+-------------------+\n|account_sid                       |sip_response|hour|window                                    |calls|avg_connect_duration|avg_pdd_ms        |min_end_time       |max_end_time       |\n+----------------------------------+------------+----+------------------------------------------+-----+--------------------+------------------+-------------------+-------------------+\n|AC999m21l79mlpnk9p78388p8n9p5549m9|600         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|37   |0.0                 |30.594594594594593|2019-07-28 20:20:10|2019-07-28 20:59:51|\n|ACkm613135mm17ok11mnkl79mpl38599n1|486         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|2    |0.0                 |978.0             |2019-07-28 20:29:14|2019-07-28 20:54:12|\n|ACokol6l9992pkm9mk99n22277o1545n26|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|7    |714.2857142857143   |48.285714285714285|2019-07-28 20:27:39|2019-07-28 20:48:31|\n|AC2k999m28noo26n81mm771ml84569lpmo|404         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|1    |0.0                 |0.0               |2019-07-28 20:33:49|2019-07-28 20:33:49|\n|AC9po3p85k475o1832lm514o9244m45np8|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|15   |133.33333333333334  |48.6              |2019-07-28 20:20:59|2019-07-28 20:59:59|\n|ACol66m9pl4n3o27n489k1k7n3ppn64719|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|152  |2048.684210526316   |91.84210526315789 |2019-07-28 20:19:46|2019-07-28 20:59:27|\n|ACk6326n554mk3m79l9842799991op5l31|486         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|1    |0.0                 |0.0               |2019-07-28 20:28:17|2019-07-28 20:28:17|\n|AC2k999m28noo26n81mm771ml84569lpmo|487         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|4    |125.0               |70.25             |2019-07-28 20:22:34|2019-07-28 20:58:47|\n|ACkm613135mm17ok11mnkl79mpl38599n1|484         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|1    |0.0                 |0.0               |2019-07-28 20:27:26|2019-07-28 20:27:26|\n|ACol66m9pl4n3o27n489k1k7n3ppn64719|0           |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|2    |0.0                 |0.0               |2019-07-28 20:20:55|2019-07-28 20:55:29|\n|ACo32nop9p5m636klmk9m9pppm981n9n88|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|14   |4792.857142857143   |90.92857142857143 |2019-07-28 20:19:13|2019-07-28 20:55:16|\n|ACk3l37m25ko158483n6l955p86p988282|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|2    |3150.0              |51.5              |2019-07-28 20:20:59|2019-07-28 20:57:02|\n|AC89192nn66mo75o94pp793nm2n2n79p6p|487         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|1    |200.0               |65.0              |2019-07-28 20:42:02|2019-07-28 20:42:02|\n|ACkm613135mm17ok11mnkl79mpl38599n1|487         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|3    |200.0               |565.6666666666666 |2019-07-28 20:35:21|2019-07-28 20:53:22|\n|ACol66m9pl4n3o27n489k1k7n3ppn64719|487         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|3    |500.0               |90.66666666666667 |2019-07-28 20:31:38|2019-07-28 20:49:39|\n|AC5mm9plnm5m7o63729947po368mo1k7m9|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|19   |3452.6315789473683  |59.89473684210526 |2019-07-28 20:21:36|2019-07-28 20:54:40|\n|AC392kp3m69577l8ln4l8p6mm6n98nn5n4|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|2    |200.0               |123.5             |2019-07-28 20:31:16|2019-07-28 20:31:16|\n|ACk6326n554mk3m79l9842799991op5l31|487         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|2    |0.0                 |131.0             |2019-07-28 20:31:32|2019-07-28 20:58:00|\n|ACk6326n554mk3m79l9842799991op5l31|600         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|1    |0.0                 |22.0              |2019-07-28 20:34:34|2019-07-28 20:34:34|\n|ACkm613135mm17ok11mnkl79mpl38599n1|200         |20  |[2019-07-28 20:00:00, 2019-07-28 21:00:00]|181  |2056.9060773480664  |932.4198895027624 |2019-07-28 20:27:34|2019-07-28 20:59:24|\n+----------------------------------+------------+----+------------------------------------------+-----+--------------------+------------------+-------------------+-------------------+\nonly showing top 20 rows\n\nwatcher: org.apache.spark.sql.RelationalGroupedDataset \u003d RelationalGroupedDataset: [grouping expressions: [account_sid, call_state ... 4 more field(s)], value: [call_sid: string, parent_call_sid: string ... 20 more fields], type: GroupBy]\nwatcherAggregation: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [account_sid: string, sip_response: int ... 7 more fields]\nwindowData: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [account_sid: string, sip_response: int ... 7 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564615762156_473267581",
+      "id": "20190731-232922_1261185896",
+      "dateCreated": "2019-07-31 23:29:22.156",
+      "dateStarted": "2019-08-01 00:11:13.828",
+      "dateFinished": "2019-08-01 00:11:17.916",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval callSeq \u003d spark.sql(\"select sum(calls) as total_calls, hour, sip_response from per_hour_report group by hour, sip_response order by hour asc\")\ncallSeq.createOrReplaceTempView(\"per_hour_report_by_sip_response\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:12:16.948",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "callSeq: org.apache.spark.sql.DataFrame \u003d [total_calls: bigint, hour: int ... 1 more field]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564616165778_1232861633",
+      "id": "20190731-233605_619993453",
+      "dateCreated": "2019-07-31 23:36:05.778",
+      "dateStarted": "2019-08-01 00:12:17.036",
+      "dateFinished": "2019-08-01 00:12:17.955",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Show Data",
+      "text": "%sql\nselect * from per_hour_report_by_sip_response",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:13:09.111",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "total_calls": "string",
+                      "hour": "string",
+                      "sip_response": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "total_calls\thour\tsip_response\n23\t0\t603\n6\t0\t404\n7\t0\t0\n10\t0\t486\n1\t0\t481\n1\t0\t484\n79\t0\t600\n3\t0\t408\n1222\t0\t200\n21\t0\t487\n1\t0\t500\n2\t0\t477\n15\t1\t486\n1\t1\t481\n5\t1\t0\n21\t1\t487\n2\t1\t404\n1195\t1\t200\n21\t1\t603\n2\t1\t408\n66\t1\t600\n58\t2\t600\n17\t2\t486\n36\t2\t603\n1\t2\t500\n8\t2\t0\n1\t2\t404\n19\t2\t487\n1215\t2\t200\n3\t2\t408\n1\t2\t410\n1030\t3\t200\n29\t3\t487\n2\t3\t500\n3\t3\t408\n5\t3\t404\n26\t3\t603\n10\t3\t486\n55\t3\t600\n6\t3\t0\n2\t3\t477\n11\t20\t603\n1\t20\t484\n6\t20\t0\n808\t20\t200\n39\t20\t600\n3\t20\t404\n14\t20\t487\n1\t20\t500\n4\t20\t486\n2\t20\t477\n60\t21\t600\n1\t21\t408\n1194\t21\t200\n6\t21\t0\n5\t21\t404\n5\t21\t500\n2\t21\t481\n21\t21\t487\n14\t21\t486\n1\t21\t484\n28\t21\t603\n22\t22\t603\n1\t22\t410\n5\t22\t404\n67\t22\t600\n18\t22\t487\n2\t22\t500\n1\t22\t477\n3\t22\t0\n9\t22\t486\n1060\t22\t200\n1\t22\t480\n2\t23\t500\n52\t23\t600\n6\t23\t0\n13\t23\t486\n1\t23\t484\n19\t23\t487\n22\t23\t603\n1233\t23\t200\n3\t23\t404\n1\t23\t477\n2\t23\t408\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564616241142_1672552496",
+      "id": "20190731-233721_512235410",
+      "dateCreated": "2019-07-31 23:37:21.142",
+      "dateStarted": "2019-08-01 00:13:02.808",
+      "dateFinished": "2019-08-01 00:13:08.919",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Sampling Dataset into training and actual data set",
+      "text": "%spark\nimport org.apache.spark.ml.linalg._\nimport scala.collection.JavaConversions._\nimport org.apache.spark.sql.SparkSession\n\n// split the array in repeatable way into a 70% train, 30% test buckets\n\nval Array (trainDF, actDF) \u003d callSeq.orderBy(\"hour\").randomSplit(Array(30, 70), 10L)\n\nval trainingDF \u003d trainDF.map(sd \u003d\u003e (sd.getInt(1), sd.getInt(2), Vectors.dense(sd.getLong(0).toDouble))).toDF(\"hour\", \"sip_response\", \"feature\")\ntrainingDF.show(false)\n\nval actualDF \u003d actDF.map(sd \u003d\u003e (sd.getInt(1), sd.getInt(2), Vectors.dense(sd.getLong(0).toDouble))).toDF(\"hour\", \"sip_response\", \"feature\")\n\nactualDF.show(false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:13:28.774",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----+------------+--------+\n|hour|sip_response|feature |\n+----+------------+--------+\n|0   |408         |[3.0]   |\n|21  |408         |[1.0]   |\n|3   |404         |[5.0]   |\n|22  |600         |[67.0]  |\n|20  |486         |[4.0]   |\n|3   |500         |[2.0]   |\n|23  |484         |[1.0]   |\n|3   |486         |[10.0]  |\n|23  |486         |[13.0]  |\n|2   |404         |[1.0]   |\n|0   |200         |[1222.0]|\n|2   |486         |[17.0]  |\n|21  |484         |[1.0]   |\n|22  |0           |[3.0]   |\n|21  |0           |[6.0]   |\n|23  |487         |[19.0]  |\n|21  |603         |[28.0]  |\n|22  |200         |[1060.0]|\n|2   |600         |[58.0]  |\n|22  |500         |[2.0]   |\n+----+------------+--------+\nonly showing top 20 rows\n\n+----+------------+-------+\n|hour|sip_response|feature|\n+----+------------+-------+\n|21  |600         |[60.0] |\n|20  |477         |[2.0]  |\n|1   |0           |[5.0]  |\n|23  |500         |[2.0]  |\n|3   |477         |[2.0]  |\n|23  |600         |[52.0] |\n|22  |410         |[1.0]  |\n|3   |408         |[3.0]  |\n|20  |484         |[1.0]  |\n|23  |0           |[6.0]  |\n|20  |500         |[1.0]  |\n|0   |481         |[1.0]  |\n|1   |408         |[2.0]  |\n|21  |487         |[21.0] |\n|0   |477         |[2.0]  |\n|3   |487         |[29.0] |\n|20  |487         |[14.0] |\n|22  |603         |[22.0] |\n|1   |487         |[21.0] |\n|1   |404         |[2.0]  |\n+----+------------+-------+\nonly showing top 20 rows\n\nimport org.apache.spark.ml.linalg._\nimport scala.collection.JavaConversions._\nimport org.apache.spark.sql.SparkSession\ntrainDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [total_calls: bigint, hour: int ... 1 more field]\nactDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [total_calls: bigint, hour: int ... 1 more field]\ntrainingDF: org.apache.spark.sql.DataFrame \u003d [hour: int, sip_response: int ... 1 more field]\nactualDF: org.apache.spark.sql.DataFrame \u003d [hour: int, sip_response: int ... 1 more field]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564616868880_474439480",
+      "id": "20190731-234748_1986133837",
+      "dateCreated": "2019-07-31 23:47:48.880",
+      "dateStarted": "2019-08-01 00:13:28.820",
+      "dateFinished": "2019-08-01 00:13:40.710",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Bucketed Random Projection is an LSH family for Euclidean distance",
+      "text": "%spark\nimport org.apache.spark.ml.feature.BucketedRandomProjectionLSH\nimport  org.apache.spark.ml.feature.BucketedRandomProjectionLSHModel\nimport org.apache.spark.ml.feature.VectorAssembler\nimport org.apache.spark.ml.{Pipeline, PipelineModel}\n\nval brp \u003d new BucketedRandomProjectionLSH()\n  .setBucketLength(24.0)\n  .setNumHashTables(3)\n  .setInputCol(\"hour\")\n  .setInputCol(\"sip_response\")\n  .setInputCol(\"feature\")\n  .setOutputCol(\"result\")\n  \nval assembler \u003d new VectorAssembler()\n  .setInputCols(Array(\"hour\", \"sip_response\", \"feature\"))\n  .setOutputCol(\"hashes\")\n\nval pipeline \u003d new Pipeline()\n  .setStages(Array(brp, assembler))\n\nval model \u003d pipeline.fit(trainingDF)\n\nval transformed \u003d model.transform(actualDF)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:14:09.316",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.ml.feature.BucketedRandomProjectionLSH\nimport org.apache.spark.ml.feature.BucketedRandomProjectionLSHModel\nimport org.apache.spark.ml.feature.VectorAssembler\nimport org.apache.spark.ml.{Pipeline, PipelineModel}\nbrp: org.apache.spark.ml.feature.BucketedRandomProjectionLSH \u003d brp-lsh_2d276e321215\nassembler: org.apache.spark.ml.feature.VectorAssembler \u003d vecAssembler_4e5e01895414\npipeline: org.apache.spark.ml.Pipeline \u003d pipeline_0d9157761799\nmodel: org.apache.spark.ml.PipelineModel \u003d pipeline_0d9157761799\ntransformed: org.apache.spark.sql.DataFrame \u003d [hour: int, sip_response: int ... 3 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564616915630_1396255145",
+      "id": "20190731-234835_1630397259",
+      "dateCreated": "2019-07-31 23:48:35.631",
+      "dateStarted": "2019-08-01 00:14:09.375",
+      "dateFinished": "2019-08-01 00:14:18.379",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Fetch the model from Pipeline",
+      "text": "%spark\nval brpModel \u003d model.stages(0).asInstanceOf[BucketedRandomProjectionLSHModel]\n\nprintln(\"Approximately joining trainingDF and actualDF on Euclidean distance smaller than 10:\")\nval modelDF \u003d brpModel.approxSimilarityJoin(trainingDF, actualDF, 10000, \"EuclideanDistance\").select(\n    col(\"datasetA.hour\").alias(\"trainingHour\"),\n    col(\"datasetA.sip_response\").alias(\"trainingSipResponse\"),\n    col(\"datasetB.hour\").alias(\"actualHour\"),\n    col(\"datasetB.sip_response\").alias(\"actualSipResponse\"),\n    col(\"euclideanDistance\"))\n\nmodelDF.createOrReplaceTempView(\"model_evaluator\")\nmodelDF.show(false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:20:53.578",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Approximately joining trainingDF and actualDF on Euclidean distance smaller than 10:\n+------------+-------------------+----------+-----------------+-----------------+\n|trainingHour|trainingSipResponse|actualHour|actualSipResponse|euclideanDistance|\n+------------+-------------------+----------+-----------------+-----------------+\n|21          |408                |20        |487              |13.0             |\n|22          |0                  |0         |0                |4.0              |\n|3           |500                |0         |484              |1.0              |\n|22          |0                  |21        |487              |18.0             |\n|3           |0                  |20        |404              |3.0              |\n|3           |486                |23        |404              |7.0              |\n|20          |486                |21        |404              |1.0              |\n|2           |487                |21        |500              |14.0             |\n|0           |408                |22        |486              |6.0              |\n|21          |484                |2         |408              |2.0              |\n|3           |486                |2         |500              |9.0              |\n|3           |404                |0         |404              |1.0              |\n|3           |0                  |3         |477              |4.0              |\n|2           |487                |22        |603              |3.0              |\n|23          |484                |20        |404              |2.0              |\n|23          |487                |23        |404              |16.0             |\n|3           |500                |1         |481              |1.0              |\n|3           |500                |22        |603              |20.0             |\n|21          |0                  |0         |0                |1.0              |\n|20          |486                |1         |486              |11.0             |\n+------------+-------------------+----------+-----------------+-----------------+\nonly showing top 20 rows\n\nbrpModel: org.apache.spark.ml.feature.BucketedRandomProjectionLSHModel \u003d brp-lsh_2d276e321215\nmodelDF: org.apache.spark.sql.DataFrame \u003d [trainingHour: int, trainingSipResponse: int ... 3 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564617035565_680591166",
+      "id": "20190731-235035_1445027148",
+      "dateCreated": "2019-07-31 23:50:35.565",
+      "dateStarted": "2019-08-01 00:20:53.612",
+      "dateFinished": "2019-08-01 00:21:04.231",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from model_evaluator",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:21:07.952",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "trainingHour": "string",
+                      "trainingSipResponse": "string",
+                      "actualHour": "string",
+                      "actualSipResponse": "string",
+                      "euclideanDistance": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "scatterChart": {
+                  "xAxis": {
+                    "name": "actualHour",
+                    "index": 2.0,
+                    "aggr": "sum"
+                  },
+                  "yAxis": {
+                    "name": "actualSipResponse",
+                    "index": 3.0,
+                    "aggr": "sum"
+                  },
+                  "size": {
+                    "name": "euclideanDistance",
+                    "index": 4.0,
+                    "aggr": "sum"
+                  }
+                }
+              }
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "trainingHour\ttrainingSipResponse\tactualHour\tactualSipResponse\teuclideanDistance\n21\t408\t20\t487\t13.0\n22\t0\t0\t0\t4.0\n3\t500\t0\t484\t1.0\n22\t0\t21\t487\t18.0\n3\t0\t20\t404\t3.0\n3\t486\t23\t404\t7.0\n20\t486\t21\t404\t1.0\n2\t487\t21\t500\t14.0\n0\t408\t22\t486\t6.0\n21\t484\t2\t408\t2.0\n3\t486\t2\t500\t9.0\n3\t404\t0\t404\t1.0\n3\t0\t3\t477\t4.0\n2\t487\t22\t603\t3.0\n23\t484\t20\t404\t2.0\n23\t487\t23\t404\t16.0\n3\t500\t1\t481\t1.0\n3\t500\t22\t603\t20.0\n21\t0\t0\t0\t1.0\n20\t486\t1\t486\t11.0\n2\t486\t0\t487\t4.0\n2\t404\t20\t477\t1.0\n3\t404\t0\t481\t4.0\n21\t0\t22\t603\t16.0\n20\t486\t1\t603\t17.0\n22\t0\t2\t410\t2.0\n2\t486\t3\t477\t15.0\n3\t500\t3\t408\t1.0\n21\t408\t21\t487\t20.0\n2\t487\t1\t487\t2.0\n23\t484\t21\t486\t13.0\n20\t486\t23\t0\t2.0\n2\t404\t0\t500\t0.0\n3\t404\t20\t603\t6.0\n2\t487\t0\t486\t9.0\n21\t0\t0\t486\t4.0\n3\t486\t20\t500\t9.0\n2\t486\t1\t487\t4.0\n0\t408\t21\t481\t1.0\n21\t408\t23\t408\t1.0\n21\t408\t20\t477\t1.0\n20\t486\t3\t477\t2.0\n3\t404\t20\t484\t4.0\n21\t603\t3\t487\t1.0\n22\t500\t0\t484\t1.0\n22\t0\t0\t484\t2.0\n2\t486\t22\t480\t16.0\n23\t486\t0\t481\t12.0\n20\t486\t22\t480\t3.0\n21\t484\t20\t484\t0.0\n23\t486\t20\t484\t12.0\n22\t500\t0\t481\t1.0\n2\t487\t20\t404\t16.0\n23\t486\t20\t404\t10.0\n23\t487\t22\t477\t18.0\n21\t0\t23\t408\t4.0\n3\t500\t21\t487\t19.0\n0\t408\t1\t487\t18.0\n2\t486\t21\t481\t15.0\n23\t484\t21\t404\t4.0\n21\t408\t21\t486\t13.0\n1\t600\t3\t600\t11.0\n21\t0\t23\t0\t0.0\n21\t408\t23\t603\t21.0\n0\t408\t23\t404\t0.0\n3\t404\t2\t0\t3.0\n2\t486\t1\t0\t12.0\n23\t484\t20\t500\t0.0\n2\t486\t1\t408\t15.0\n2\t487\t0\t477\t17.0\n2\t404\t0\t0\t6.0\n23\t486\t0\t603\t10.0\n3\t500\t0\t603\t21.0\n20\t600\t3\t603\t13.0\n2\t404\t0\t477\t1.0\n22\t500\t23\t603\t20.0\n22\t500\t23\t404\t1.0\n2\t487\t21\t404\t14.0\n3\t486\t21\t404\t5.0\n0\t408\t1\t603\t18.0\n23\t487\t0\t487\t2.0\n2\t487\t22\t410\t18.0\n21\t408\t23\t0\t5.0\n2\t487\t20\t487\t5.0\n23\t486\t21\t481\t11.0\n21\t484\t23\t603\t21.0\n3\t0\t2\t500\t5.0\n21\t408\t0\t484\t0.0\n3\t0\t22\t487\t12.0\n2\t487\t3\t408\t16.0\n0\t408\t3\t408\t0.0\n3\t0\t1\t487\t15.0\n3\t500\t1\t487\t19.0\n3\t500\t0\t0\t5.0\n3\t404\t23\t603\t17.0\n3\t486\t23\t477\t9.0\n21\t0\t0\t603\t17.0\n23\t487\t21\t404\t14.0\n23\t484\t2\t0\t7.0\n0\t408\t0\t484\t2.0\n21\t0\t0\t481\t5.0\n0\t408\t0\t404\t3.0\n3\t486\t0\t484\t9.0\n2\t487\t2\t500\t18.0\n3\t486\t22\t477\t9.0\n3\t404\t1\t0\t0.0\n23\t484\t0\t603\t22.0\n23\t486\t0\t484\t12.0\n3\t486\t21\t486\t4.0\n3\t486\t22\t603\t12.0\n3\t486\t22\t404\t5.0\n2\t487\t0\t484\t18.0\n0\t408\t21\t500\t2.0\n2\t487\t1\t404\t17.0\n23\t486\t23\t603\t9.0\n22\t0\t21\t500\t2.0\n21\t408\t22\t480\t0.0\n2\t487\t23\t603\t3.0\n23\t486\t20\t477\t11.0\n3\t404\t20\t477\t3.0\n23\t487\t23\t0\t13.0\n23\t484\t22\t404\t4.0\n23\t486\t1\t486\t2.0\n3\t486\t1\t486\t5.0\n2\t487\t0\t487\t2.0\n2\t486\t23\t408\t15.0\n0\t408\t23\t477\t2.0\n21\t0\t1\t486\t9.0\n22\t0\t22\t477\t2.0\n0\t408\t22\t477\t2.0\n23\t484\t2\t408\t2.0\n23\t486\t1\t0\t8.0\n3\t486\t23\t0\t4.0\n2\t487\t1\t408\t17.0\n23\t487\t0\t0\t12.0\n23\t486\t22\t487\t5.0\n22\t500\t20\t404\t1.0\n2\t487\t1\t481\t18.0\n23\t486\t20\t0\t7.0\n22\t500\t20\t500\t1.0\n21\t0\t21\t500\t1.0\n0\t408\t20\t484\t2.0\n22\t500\t20\t487\t12.0\n0\t408\t2\t408\t0.0\n21\t0\t23\t500\t4.0\n0\t408\t23\t500\t1.0\n3\t486\t20\t0\t4.0\n21\t484\t0\t487\t20.0\n3\t500\t2\t410\t1.0\n3\t0\t22\t410\t5.0\n21\t484\t0\t481\t0.0\n2\t404\t0\t481\t0.0\n21\t0\t2\t500\t5.0\n2\t486\t21\t486\t3.0\n21\t408\t20\t484\t0.0\n20\t486\t21\t481\t2.0\n0\t408\t22\t487\t15.0\n23\t484\t0\t500\t0.0\n3\t0\t1\t408\t4.0\n3\t0\t21\t500\t1.0\n3\t500\t2\t408\t1.0\n22\t500\t1\t0\t3.0\n20\t486\t20\t484\t3.0\n3\t0\t20\t500\t5.0\n22\t0\t0\t404\t3.0\n2\t600\t23\t600\t6.0\n22\t0\t22\t603\t19.0\n3\t500\t2\t500\t1.0\n2\t486\t0\t404\t11.0\n21\t484\t22\t477\t0.0\n23\t487\t23\t477\t18.0\n2\t487\t2\t0\t11.0\n20\t486\t0\t0\t3.0\n2\t404\t21\t481\t1.0\n23\t484\t23\t603\t21.0\n2\t487\t23\t477\t18.0\n21\t0\t0\t404\t0.0\n21\t408\t22\t477\t0.0\n3\t0\t20\t603\t5.0\n23\t484\t22\t486\t8.0\n3\t0\t0\t484\t5.0\n3\t0\t1\t486\t9.0\n22\t500\t20\t477\t0.0\n23\t484\t20\t477\t1.0\n23\t484\t22\t487\t17.0\n20\t486\t23\t404\t1.0\n21\t408\t2\t410\t0.0\n3\t404\t23\t408\t3.0\n3\t404\t23\t0\t1.0\n23\t484\t1\t408\t1.0\n23\t486\t21\t487\t8.0\n21\t0\t20\t404\t3.0\n2\t486\t1\t481\t16.0\n21\t603\t2\t603\t8.0\n21\t408\t22\t404\t4.0\n20\t486\t2\t408\t1.0\n2\t487\t3\t477\t17.0\n0\t408\t21\t487\t18.0\n21\t408\t1\t487\t20.0\n2\t487\t21\t486\t5.0\n23\t487\t0\t500\t18.0\n22\t500\t21\t487\t19.0\n2\t486\t23\t477\t16.0\n23\t484\t0\t486\t9.0\n21\t408\t1\t486\t14.0\n2\t487\t23\t0\t13.0\n23\t486\t1\t408\t11.0\n22\t500\t0\t477\t0.0\n3\t500\t0\t477\t0.0\n21\t484\t0\t0\t6.0\n23\t484\t0\t484\t0.0\n23\t484\t1\t0\t4.0\n23\t487\t0\t481\t18.0\n21\t0\t0\t484\t5.0\n2\t486\t20\t484\t16.0\n22\t0\t20\t404\t0.0\n21\t0\t1\t481\t5.0\n0\t408\t1\t481\t2.0\n0\t408\t2\t500\t2.0\n3\t404\t22\t404\t0.0\n2\t600\t21\t600\t2.0\n2\t404\t23\t477\t0.0\n3\t500\t21\t404\t3.0\n20\t486\t0\t404\t2.0\n20\t486\t23\t408\t2.0\n22\t0\t1\t481\t2.0\n2\t486\t2\t500\t16.0\n3\t0\t21\t404\t1.0\n2\t486\t21\t404\t12.0\n3\t486\t1\t0\t5.0\n22\t500\t20\t484\t1.0\n22\t0\t20\t484\t2.0\n2\t404\t23\t0\t5.0\n2\t404\t20\t500\t0.0\n2\t404\t23\t404\t2.0\n0\t408\t20\t0\t3.0\n0\t408\t22\t480\t2.0\n2\t486\t20\t477\t15.0\n0\t408\t21\t404\t2.0\n23\t487\t22\t486\t10.0\n22\t0\t2\t0\t5.0\n20\t486\t21\t487\t17.0\n23\t486\t0\t477\t11.0\n22\t500\t22\t487\t16.0\n21\t408\t1\t481\t0.0\n2\t486\t22\t404\t12.0\n2\t486\t2\t0\t9.0\n2\t486\t1\t603\t4.0\n20\t486\t0\t484\t3.0\n3\t500\t22\t480\t1.0\n2\t487\t20\t477\t17.0\n21\t484\t0\t477\t1.0\n2\t404\t1\t404\t1.0\n21\t0\t23\t477\t5.0\n23\t487\t2\t410\t18.0\n23\t486\t20\t487\t1.0\n23\t484\t23\t477\t0.0\n2\t487\t20\t0\t13.0\n21\t484\t22\t603\t21.0\n3\t486\t21\t481\t8.0\n22\t500\t2\t0\t6.0\n21\t0\t1\t0\t1.0\n21\t484\t1\t0\t4.0\n21\t0\t22\t404\t1.0\n21\t603\t3\t603\t2.0\n22\t500\t1\t404\t0.0\n21\t408\t1\t603\t20.0\n3\t486\t0\t500\t9.0\n23\t486\t2\t410\t12.0\n21\t484\t21\t481\t1.0\n2\t404\t21\t404\t4.0\n3\t0\t2\t0\t2.0\n2\t486\t3\t408\t14.0\n2\t487\t22\t487\t1.0\n23\t487\t23\t603\t3.0\n21\t484\t21\t486\t13.0\n2\t404\t1\t486\t14.0\n2\t404\t1\t0\t4.0\n2\t486\t20\t500\t16.0\n23\t487\t1\t404\t17.0\n2\t487\t22\t404\t14.0\n2\t486\t0\t500\t16.0\n0\t408\t22\t410\t2.0\n21\t0\t22\t487\t12.0\n21\t484\t20\t404\t2.0\n0\t408\t22\t404\t2.0\n21\t0\t22\t480\t5.0\n22\t0\t22\t410\t2.0\n3\t500\t20\t487\t12.0\n2\t487\t22\t486\t10.0\n2\t404\t21\t500\t4.0\n2\t487\t1\t486\t4.0\n23\t487\t23\t408\t17.0\n2\t404\t23\t408\t1.0\n21\t408\t3\t408\t2.0\n2\t487\t0\t404\t13.0\n22\t0\t23\t408\t1.0\n21\t484\t20\t477\t1.0\n20\t486\t1\t0\t1.0\n21\t0\t20\t484\t5.0\n23\t486\t23\t0\t7.0\n21\t408\t0\t481\t0.0\n3\t486\t1\t404\t8.0\n3\t404\t21\t481\t3.0\n2\t404\t20\t603\t10.0\n21\t408\t21\t404\t4.0\n20\t486\t2\t410\t3.0\n2\t487\t1\t0\t14.0\n3\t404\t20\t0\t1.0\n3\t500\t22\t477\t1.0\n2\t487\t20\t603\t8.0\n23\t487\t0\t404\t13.0\n23\t487\t2\t408\t16.0\n21\t408\t0\t487\t20.0\n2\t487\t20\t484\t18.0\n2\t404\t20\t484\t0.0\n3\t500\t23\t0\t4.0\n20\t486\t1\t487\t17.0\n20\t486\t22\t486\t5.0\n21\t0\t0\t500\t5.0\n23\t484\t22\t480\t0.0\n22\t0\t3\t477\t1.0\n21\t0\t21\t487\t15.0\n0\t408\t22\t603\t19.0\n23\t487\t0\t603\t4.0\n22\t0\t22\t480\t2.0\n23\t487\t20\t500\t18.0\n23\t486\t20\t500\t12.0\n0\t408\t1\t0\t2.0\n21\t484\t20\t500\t0.0\n22\t0\t0\t486\t7.0\n3\t486\t2\t408\t7.0\n20\t486\t1\t408\t2.0\n3\t500\t22\t486\t7.0\n3\t500\t0\t486\t8.0\n22\t500\t1\t603\t19.0\n20\t486\t1\t481\t3.0\n20\t600\t2\t603\t3.0\n2\t486\t21\t500\t12.0\n2\t404\t2\t408\t2.0\n0\t408\t20\t477\t1.0\n23\t484\t0\t481\t0.0\n23\t486\t2\t500\t12.0\n23\t487\t0\t484\t18.0\n3\t0\t0\t500\t5.0\n20\t486\t0\t500\t3.0\n21\t484\t0\t500\t0.0\n3\t500\t20\t500\t1.0\n22\t500\t21\t481\t0.0\n2\t404\t22\t487\t17.0\n20\t486\t22\t404\t1.0\n22\t500\t21\t404\t3.0\n21\t0\t22\t486\t3.0\n21\t484\t1\t603\t20.0\n23\t487\t22\t487\t1.0\n20\t486\t20\t404\t1.0\n2\t487\t1\t603\t2.0\n21\t484\t0\t484\t0.0\n2\t486\t22\t477\t16.0\n21\t484\t23\t408\t1.0\n21\t484\t23\t0\t5.0\n21\t484\t1\t486\t14.0\n23\t487\t22\t480\t18.0\n22\t500\t22\t603\t20.0\n23\t487\t1\t0\t14.0\n23\t484\t0\t477\t1.0\n21\t408\t2\t500\t0.0\n3\t486\t22\t486\t1.0\n22\t0\t0\t500\t2.0\n22\t600\t21\t600\t7.0\n20\t486\t0\t481\t3.0\n2\t404\t22\t603\t21.0\n23\t486\t23\t408\t11.0\n2\t404\t1\t408\t1.0\n20\t486\t20\t487\t10.0\n3\t486\t0\t404\t4.0\n2\t487\t23\t500\t17.0\n2\t486\t22\t603\t5.0\n2\t404\t1\t487\t20.0\n21\t484\t22\t487\t17.0\n22\t500\t1\t481\t1.0\n23\t484\t21\t500\t4.0\n23\t484\t23\t408\t1.0\n22\t500\t3\t408\t1.0\n3\t404\t23\t477\t4.0\n2\t404\t2\t500\t0.0\n22\t500\t20\t0\t4.0\n2\t486\t1\t486\t2.0\n3\t404\t22\t477\t4.0\n22\t500\t3\t477\t0.0\n2\t486\t23\t404\t14.0\n22\t0\t20\t603\t8.0\n0\t408\t1\t404\t1.0\n21\t0\t0\t487\t15.0\n22\t0\t0\t487\t18.0\n23\t487\t23\t500\t17.0\n21\t408\t20\t500\t0.0\n22\t0\t21\t481\t1.0\n23\t487\t20\t0\t13.0\n23\t486\t2\t408\t10.0\n23\t484\t22\t410\t0.0\n3\t404\t20\t487\t9.0\n0\t408\t0\t486\t7.0\n23\t487\t21\t486\t5.0\n21\t0\t3\t477\t4.0\n20\t486\t20\t603\t7.0\n21\t484\t2\t500\t0.0\n2\t404\t0\t487\t20.0\n21\t484\t3\t408\t2.0\n3\t486\t20\t487\t4.0\n3\t404\t22\t487\t13.0\n3\t404\t3\t477\t3.0\n22\t0\t20\t500\t2.0\n21\t0\t20\t487\t8.0\n3\t500\t1\t486\t13.0\n22\t500\t2\t408\t1.0\n22\t500\t1\t408\t0.0\n22\t0\t0\t477\t1.0\n20\t486\t0\t603\t19.0\n3\t486\t0\t477\t8.0\n2\t404\t23\t603\t21.0\n20\t486\t2\t0\t4.0\n23\t484\t1\t486\t14.0\n22\t0\t2\t408\t0.0\n21\t0\t20\t477\t4.0\n20\t486\t20\t500\t3.0\n20\t486\t22\t603\t18.0\n22\t500\t21\t486\t12.0\n3\t486\t2\t410\t9.0\n22\t500\t22\t480\t1.0\n3\t404\t21\t404\t0.0\n21\t484\t22\t486\t8.0\n2\t487\t22\t477\t18.0\n3\t404\t0\t487\t16.0\n2\t404\t22\t480\t0.0\n21\t0\t22\t410\t5.0\n22\t0\t1\t408\t1.0\n0\t408\t20\t487\t11.0\n3\t0\t22\t603\t16.0\n21\t0\t23\t603\t16.0\n23\t487\t20\t603\t8.0\n23\t487\t3\t477\t17.0\n21\t484\t22\t410\t0.0\n20\t486\t23\t603\t18.0\n23\t486\t2\t0\t5.0\n3\t500\t20\t0\t4.0\n21\t0\t22\t477\t5.0\n2\t486\t22\t410\t16.0\n3\t0\t0\t481\t5.0\n2\t486\t23\t603\t5.0\n3\t486\t1\t481\t9.0\n22\t500\t2\t410\t1.0\n2\t487\t0\t603\t4.0\n23\t487\t2\t500\t18.0\n3\t404\t2\t500\t4.0\n21\t0\t2\t0\t2.0\n3\t486\t0\t487\t11.0\n2\t487\t2\t410\t18.0\n3\t486\t20\t477\t8.0\n2\t404\t3\t477\t1.0\n20\t486\t3\t408\t1.0\n22\t500\t1\t487\t19.0\n21\t484\t22\t404\t4.0\n2\t404\t2\t410\t0.0\n21\t408\t22\t603\t21.0\n21\t0\t1\t487\t15.0\n0\t408\t2\t0\t5.0\n21\t0\t2\t408\t3.0\n23\t487\t0\t477\t17.0\n3\t486\t23\t603\t12.0\n3\t404\t2\t408\t2.0\n3\t486\t1\t487\t11.0\n22\t0\t1\t404\t1.0\n21\t408\t0\t0\t6.0\n3\t0\t23\t603\t16.0\n22\t0\t23\t404\t0.0\n23\t487\t1\t408\t17.0\n2\t487\t0\t0\t12.0\n20\t486\t2\t500\t3.0\n22\t0\t1\t486\t12.0\n2\t404\t22\t477\t0.0\n2\t487\t22\t480\t18.0\n22\t0\t1\t0\t2.0\n23\t486\t3\t408\t10.0\n22\t0\t23\t0\t3.0\n21\t484\t21\t487\t20.0\n22\t500\t0\t404\t4.0\n21\t0\t21\t486\t8.0\n2\t487\t23\t408\t17.0\n3\t486\t23\t500\t8.0\n2\t486\t0\t0\t10.0\n22\t0\t3\t408\t0.0\n22\t0\t0\t481\t2.0\n3\t500\t21\t481\t0.0\n21\t0\t2\t410\t5.0\n21\t408\t21\t500\t4.0\n3\t486\t2\t0\t2.0\n2\t404\t1\t603\t20.0\n3\t500\t23\t500\t0.0\n3\t486\t21\t500\t5.0\n3\t500\t21\t486\t12.0\n2\t487\t0\t500\t18.0\n2\t487\t20\t500\t18.0\n21\t484\t1\t408\t1.0\n3\t0\t21\t481\t4.0\n2\t486\t22\t487\t1.0\n20\t486\t0\t486\t6.0\n2\t487\t0\t481\t18.0\n22\t0\t22\t487\t15.0\n2\t486\t20\t0\t11.0\n22\t0\t23\t477\t2.0\n3\t500\t23\t404\t1.0\n21\t408\t23\t404\t2.0\n23\t484\t3\t477\t1.0\n3\t486\t21\t487\t11.0\n2\t404\t22\t486\t8.0\n23\t487\t2\t0\t11.0\n21\t484\t2\t0\t7.0\n2\t486\t23\t0\t11.0\n3\t404\t21\t487\t16.0\n22\t0\t1\t487\t18.0\n21\t408\t22\t487\t17.0\n3\t500\t21\t500\t3.0\n0\t408\t21\t486\t11.0\n23\t486\t0\t487\t8.0\n23\t484\t0\t487\t20.0\n3\t500\t22\t410\t1.0\n2\t487\t21\t487\t2.0\n23\t484\t1\t404\t1.0\n20\t486\t22\t487\t14.0\n23\t487\t1\t603\t2.0\n3\t486\t22\t410\t9.0\n3\t0\t1\t404\t4.0\n3\t404\t0\t0\t2.0\n21\t408\t23\t477\t0.0\n21\t484\t23\t404\t2.0\n0\t408\t1\t408\t1.0\n21\t408\t0\t603\t22.0\n23\t486\t21\t500\t8.0\n22\t0\t1\t603\t18.0\n23\t487\t20\t484\t18.0\n23\t486\t22\t603\t9.0\n3\t0\t1\t0\t1.0\n3\t500\t20\t484\t1.0\n21\t0\t0\t477\t4.0\n0\t408\t20\t603\t8.0\n2\t486\t23\t500\t15.0\n22\t0\t23\t603\t19.0\n2\t404\t22\t410\t0.0\n23\t484\t23\t404\t2.0\n0\t408\t0\t487\t18.0\n23\t487\t22\t410\t18.0\n0\t408\t0\t481\t2.0\n21\t0\t1\t404\t4.0\n21\t408\t1\t404\t1.0\n3\t486\t22\t487\t8.0\n22\t600\t23\t600\t15.0\n2\t404\t1\t481\t0.0\n3\t404\t0\t603\t18.0\n22\t500\t22\t404\t3.0\n3\t404\t1\t408\t3.0\n23\t486\t23\t404\t10.0\n2\t404\t20\t0\t5.0\n22\t0\t20\t477\t1.0\n3\t500\t1\t408\t0.0\n2\t486\t21\t487\t4.0\n20\t486\t23\t477\t3.0\n22\t600\t3\t600\t12.0\n23\t486\t22\t477\t12.0\n21\t484\t23\t500\t1.0\n23\t486\t3\t477\t11.0\n3\t0\t3\t408\t3.0\n2\t486\t0\t481\t16.0\n23\t484\t1\t487\t20.0\n22\t500\t0\t0\t5.0\n21\t484\t20\t603\t10.0\n22\t500\t22\t486\t7.0\n3\t486\t22\t480\t9.0\n3\t404\t3\t408\t2.0\n3\t0\t23\t0\t0.0\n21\t0\t20\t500\t5.0\n21\t0\t1\t408\t4.0\n2\t486\t0\t477\t15.0\n2\t404\t20\t487\t13.0\n23\t487\t22\t603\t3.0\n23\t486\t1\t603\t8.0\n3\t486\t0\t481\t9.0\n3\t486\t20\t404\t7.0\n21\t484\t20\t0\t5.0\n23\t487\t21\t487\t2.0\n20\t486\t22\t477\t3.0\n22\t500\t0\t487\t19.0\n3\t500\t22\t487\t16.0\n23\t484\t20\t603\t10.0\n2\t404\t0\t404\t5.0\n0\t408\t0\t603\t20.0\n3\t500\t20\t477\t0.0\n20\t600\t3\t487\t10.0\n21\t408\t1\t0\t4.0\n23\t487\t20\t404\t16.0\n23\t487\t0\t486\t9.0\n20\t486\t21\t486\t10.0\n21\t408\t2\t408\t2.0\n3\t0\t23\t408\t4.0\n21\t484\t1\t487\t20.0\n0\t408\t23\t603\t19.0\n3\t500\t23\t477\t1.0\n2\t486\t0\t603\t6.0\n2\t487\t2\t408\t16.0\n23\t486\t22\t480\t12.0\n21\t484\t3\t477\t1.0\n21\t408\t3\t477\t1.0\n23\t487\t3\t408\t16.0\n2\t486\t20\t404\t14.0\n23\t486\t23\t477\t12.0\n21\t408\t20\t0\t5.0\n23\t486\t0\t486\t3.0\n0\t408\t1\t486\t12.0\n3\t0\t2\t408\t3.0\n23\t484\t2\t410\t0.0\n2\t486\t20\t603\t6.0\n21\t484\t0\t486\t9.0\n23\t486\t23\t500\t11.0\n21\t408\t0\t477\t1.0\n3\t404\t1\t404\t3.0\n22\t500\t21\t500\t3.0\n23\t486\t22\t486\t4.0\n3\t500\t0\t500\t1.0\n1\t600\t21\t600\t6.0\n22\t0\t23\t500\t1.0\n3\t500\t1\t404\t0.0\n21\t408\t21\t481\t1.0\n21\t484\t21\t500\t4.0\n3\t500\t0\t481\t1.0\n20\t486\t0\t477\t2.0\n3\t0\t0\t0\t1.0\n2\t487\t23\t404\t16.0\n22\t500\t0\t486\t8.0\n23\t486\t0\t500\t12.0\n22\t0\t20\t487\t11.0\n3\t404\t1\t487\t16.0\n3\t486\t3\t408\t7.0\n23\t484\t23\t0\t5.0\n23\t487\t20\t487\t5.0\n3\t404\t21\t500\t0.0\n21\t408\t0\t486\t9.0\n23\t484\t22\t477\t0.0\n23\t487\t21\t481\t17.0\n2\t404\t20\t404\t2.0\n3\t486\t0\t603\t13.0\n2\t404\t3\t408\t2.0\n21\t0\t21\t481\t4.0\n3\t0\t1\t481\t5.0\n3\t404\t1\t481\t4.0\n3\t0\t20\t0\t0.0\n3\t0\t22\t480\t5.0\n3\t500\t23\t408\t0.0\n3\t500\t20\t603\t9.0\n3\t0\t0\t486\t4.0\n0\t408\t2\t410\t2.0\n0\t408\t0\t477\t1.0\n22\t500\t23\t477\t1.0\n20\t486\t21\t500\t1.0\n3\t404\t22\t486\t4.0\n3\t500\t2\t0\t6.0\n22\t500\t23\t408\t0.0\n23\t484\t21\t481\t1.0\n21\t408\t22\t486\t8.0\n20\t486\t23\t500\t2.0\n3\t0\t1\t603\t15.0\n2\t600\t3\t600\t3.0\n0\t408\t3\t477\t1.0\n23\t486\t1\t404\t11.0\n2\t486\t0\t486\t7.0\n21\t408\t20\t404\t2.0\n22\t500\t0\t603\t21.0\n23\t484\t2\t500\t0.0\n23\t484\t0\t404\t5.0\n2\t404\t0\t486\t9.0\n0\t408\t0\t500\t2.0\n3\t500\t3\t477\t0.0\n3\t486\t20\t484\t9.0\n3\t0\t23\t404\t3.0\n22\t500\t20\t603\t9.0\n3\t0\t0\t603\t17.0\n22\t500\t0\t500\t1.0\n20\t486\t0\t487\t17.0\n3\t0\t20\t484\t5.0\n3\t0\t20\t487\t8.0\n23\t487\t1\t481\t18.0\n21\t484\t1\t481\t0.0\n23\t484\t1\t481\t0.0\n3\t0\t22\t404\t1.0\n2\t486\t1\t404\t15.0\n22\t0\t21\t404\t2.0\n3\t0\t21\t486\t8.0\n0\t408\t23\t408\t1.0\n23\t487\t1\t487\t2.0\n21\t484\t1\t404\t1.0\n21\t408\t2\t0\t7.0\n0\t408\t23\t0\t3.0\n23\t484\t22\t603\t21.0\n3\t500\t23\t603\t20.0\n22\t0\t22\t486\t6.0\n3\t0\t21\t487\t15.0\n3\t404\t0\t477\t3.0\n3\t0\t0\t404\t0.0\n3\t500\t1\t603\t19.0\n22\t0\t21\t486\t11.0\n3\t404\t2\t410\t4.0\n3\t404\t22\t480\t4.0\n2\t487\t21\t481\t17.0\n21\t484\t20\t487\t13.0\n3\t404\t23\t404\t2.0\n3\t404\t22\t410\t4.0\n20\t486\t1\t404\t2.0\n3\t500\t0\t404\t4.0\n3\t404\t1\t603\t16.0\n3\t486\t3\t477\t8.0\n23\t484\t0\t0\t6.0\n22\t500\t2\t500\t1.0\n21\t484\t21\t404\t4.0\n21\t0\t20\t0\t0.0\n3\t486\t1\t408\t8.0\n23\t486\t21\t404\t8.0\n2\t404\t2\t0\t7.0\n22\t0\t0\t603\t20.0\n3\t404\t0\t486\t5.0\n23\t487\t1\t486\t4.0\n22\t500\t22\t477\t1.0\n21\t484\t2\t410\t0.0\n21\t484\t22\t480\t0.0\n23\t484\t20\t487\t13.0\n3\t486\t0\t0\t3.0\n22\t0\t2\t500\t2.0\n2\t486\t2\t410\t16.0\n3\t0\t20\t477\t4.0\n0\t408\t20\t500\t2.0\n2\t404\t21\t487\t20.0\n21\t0\t21\t404\t1.0\n23\t486\t22\t404\t8.0\n3\t404\t21\t486\t9.0\n23\t484\t3\t408\t2.0\n23\t486\t1\t481\t12.0\n21\t408\t20\t603\t10.0\n21\t484\t0\t603\t22.0\n22\t0\t22\t404\t2.0\n20\t486\t20\t0\t2.0\n23\t487\t20\t477\t17.0\n20\t486\t20\t477\t2.0\n0\t408\t20\t404\t0.0\n3\t0\t23\t477\t5.0\n23\t486\t0\t404\t7.0\n2\t404\t21\t486\t13.0\n23\t486\t20\t603\t2.0\n3\t486\t20\t603\t1.0\n3\t404\t1\t486\t10.0\n3\t0\t23\t500\t4.0\n22\t500\t23\t500\t0.0\n3\t0\t22\t477\t5.0\n2\t404\t23\t500\t1.0\n2\t486\t0\t484\t16.0\n21\t408\t0\t500\t0.0\n3\t500\t0\t487\t19.0\n3\t486\t23\t408\t8.0\n1\t600\t23\t600\t14.0\n23\t486\t22\t410\t12.0\n23\t484\t21\t487\t20.0\n23\t486\t1\t487\t8.0\n3\t404\t20\t404\t2.0\n3\t486\t1\t603\t11.0\n0\t408\t0\t0\t4.0\n2\t404\t0\t484\t0.0\n3\t0\t2\t410\t5.0\n3\t500\t1\t0\t3.0\n23\t484\t23\t500\t1.0\n3\t500\t20\t404\t1.0\n21\t484\t23\t477\t0.0\n3\t500\t22\t404\t3.0\n20\t486\t22\t410\t3.0\n21\t408\t1\t408\t1.0\n2\t486\t22\t486\t8.0\n23\t484\t20\t0\t5.0\n3\t404\t0\t500\t4.0\n22\t500\t22\t410\t1.0\n23\t484\t20\t484\t0.0\n3\t404\t22\t603\t17.0\n2\t404\t0\t603\t22.0\n22\t500\t1\t486\t13.0\n3\t0\t0\t477\t4.0\n23\t487\t21\t500\t14.0\n23\t487\t22\t404\t14.0\n23\t484\t1\t603\t20.0\n3\t404\t0\t484\t4.0\n23\t486\t21\t486\t1.0\n22\t500\t23\t0\t4.0\n2\t486\t20\t487\t3.0\n21\t484\t0\t404\t5.0\n21\t0\t23\t404\t3.0\n3\t0\t22\t486\t3.0\n3\t486\t0\t486\t0.0\n3\t404\t23\t500\t3.0\n21\t408\t22\t410\t0.0\n23\t486\t0\t0\t6.0\n2\t404\t22\t404\t4.0\n22\t0\t20\t0\t3.0\n21\t0\t1\t603\t15.0\n21\t408\t23\t500\t1.0\n3\t404\t20\t500\t4.0\n3\t0\t0\t487\t15.0\n21\t0\t3\t408\t3.0\n21\t0\t20\t603\t5.0\n2\t486\t2\t408\t14.0\n21\t408\t0\t404\t5.0\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564617091777_-701007749",
+      "id": "20190731-235131_846695546",
+      "dateCreated": "2019-07-31 23:51:31.777",
+      "dateStarted": "2019-08-01 00:21:08.035",
+      "dateFinished": "2019-08-01 00:21:19.995",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 00:21:07.953",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564618867952_-1572049929",
+      "id": "20190801-002107_1602066787",
+      "dateCreated": "2019-08-01 00:21:07.952",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "Signal2019/4_MachineLearning",
+  "id": "2EHJ176VX",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

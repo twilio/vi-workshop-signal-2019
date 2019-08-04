@@ -1,0 +1,455 @@
+{
+  "paragraphs": [
+    {
+      "title": "Load Parquet Data",
+      "text": "%spark\n\nval df \u003d spark.read.parquet(\"hdfs://namenode:8020/voiceinsights/signal2019/data/signal-call-summary-data-xs.parquet\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 20:52:58.991",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "df: org.apache.spark.sql.DataFrame \u003d [call_sid: string, parent_call_sid: string ... 20 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512192388_-2075547612",
+      "id": "20190730-184312_490761170",
+      "dateCreated": "2019-07-30 18:43:12.388",
+      "dateStarted": "2019-07-30 19:47:05.956",
+      "dateFinished": "2019-07-30 19:47:53.935",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Look at the Inferred Schema",
+      "text": "%spark\ndf.printSchema",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 19:47:53.970",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- call_sid: string (nullable \u003d true)\n |-- parent_call_sid: string (nullable \u003d true)\n |-- account_sid: string (nullable \u003d true)\n |-- parent_account_sid: string (nullable \u003d true)\n |-- start_time: string (nullable \u003d true)\n |-- end_time: string (nullable \u003d true)\n |-- duration: integer (nullable \u003d true)\n |-- connect_duration: integer (nullable \u003d true)\n |-- call_type: string (nullable \u003d true)\n |-- call_state: string (nullable \u003d true)\n |-- call_direction: string (nullable \u003d true)\n |-- disconnect_by: string (nullable \u003d true)\n |-- from: struct (nullable \u003d true)\n |    |-- caller: string (nullable \u003d true)\n |    |-- callee: string (nullable \u003d true)\n |    |-- carrier: string (nullable \u003d true)\n |    |-- connection: string (nullable \u003d true)\n |    |-- number_prefix: string (nullable \u003d true)\n |    |-- location: struct (nullable \u003d true)\n |    |    |-- lat: float (nullable \u003d true)\n |    |    |-- lon: float (nullable \u003d true)\n |    |-- city: string (nullable \u003d true)\n |    |-- country_code: string (nullable \u003d true)\n |    |-- country_subdivision: string (nullable \u003d true)\n |    |-- ip_address: string (nullable \u003d true)\n |-- to: struct (nullable \u003d true)\n |    |-- caller: string (nullable \u003d true)\n |    |-- callee: string (nullable \u003d true)\n |    |-- carrier: string (nullable \u003d true)\n |    |-- connection: string (nullable \u003d true)\n |    |-- number_prefix: string (nullable \u003d true)\n |    |-- location: struct (nullable \u003d true)\n |    |    |-- lat: float (nullable \u003d true)\n |    |    |-- lon: float (nullable \u003d true)\n |    |-- city: string (nullable \u003d true)\n |    |-- country_code: string (nullable \u003d true)\n |    |-- country_subdivision: string (nullable \u003d true)\n |    |-- ip_address: string (nullable \u003d true)\n |-- processing_state: string (nullable \u003d true)\n |-- pdd_ms: integer (nullable \u003d true)\n |-- tags: array (nullable \u003d true)\n |    |-- element: string (containsNull \u003d true)\n |-- properties: struct (nullable \u003d true)\n |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |-- pdd_ms: integer (nullable \u003d true)\n |    |-- route_id: string (nullable \u003d true)\n |    |-- media_region: string (nullable \u003d true)\n |    |-- signaling_region: string (nullable \u003d true)\n |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |-- external_media_ip: string (nullable \u003d true)\n |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |-- sip_call_id: string (nullable \u003d true)\n |    |-- user_agent: string (nullable \u003d true)\n |    |-- selected_region: string (nullable \u003d true)\n |    |-- region: string (nullable \u003d true)\n |    |-- trunk_sid: string (nullable \u003d true)\n |-- carrier_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n |-- sip_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n |-- client_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n |-- sdk_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512268233_581753821",
+      "id": "20190730-184428_1706185710",
+      "dateCreated": "2019-07-30 18:44:28.233",
+      "dateStarted": "2019-07-30 19:47:54.244",
+      "dateFinished": "2019-07-30 19:47:54.840",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Look at the SQL schema",
+      "text": "%spark\ndf.schema.toDDL",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 19:47:54.931",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "res2: String \u003d `call_sid` STRING,`parent_call_sid` STRING,`account_sid` STRING,`parent_account_sid` STRING,`start_time` STRING,`end_time` STRING,`duration` INT,`connect_duration` INT,`call_type` STRING,`call_state` STRING,`call_direction` STRING,`disconnect_by` STRING,`from` STRUCT\u003c`caller`: STRING, `callee`: STRING, `carrier`: STRING, `connection`: STRING, `number_prefix`: STRING, `location`: STRUCT\u003c`lat`: FLOAT, `lon`: FLOAT\u003e, `city`: STRING, `country_code`: STRING, `country_subdivision`: STRING, `ip_address`: STRING\u003e,`to` STRUCT\u003c`caller`: STRING, `callee`: STRING, `carrier`: STRING, `connection`: STRING, `number_prefix`: STRING, `location`: STRUCT\u003c`lat`: FLOAT, `lon`: FLOAT\u003e, `city`: STRING, `country_code`: STRING, `country_subdivision`: STRING, `ip_address`: STRING\u003e,`processing_stat..."
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512325825_-1460450208",
+      "id": "20190730-184525_1083945354",
+      "dateCreated": "2019-07-30 18:45:25.826",
+      "dateStarted": "2019-07-30 19:47:55.250",
+      "dateFinished": "2019-07-30 19:47:56.235",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Create a Temp View (SQL Table) named `primer`",
+      "text": "%spark\ndf.createOrReplaceTempView(\"primer\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 19:49:30.993",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512354101_283608119",
+      "id": "20190730-184554_71075504",
+      "dateCreated": "2019-07-30 18:45:54.101",
+      "dateStarted": "2019-07-30 19:49:31.063",
+      "dateFinished": "2019-07-30 19:49:31.431",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Find aggregation of Call States by count",
+      "text": "%spark\n// using spark DSL\nval callStateCounts \u003d df\n  .groupBy(\"call_state\")\n  .count\n  .sort(desc(\"count\"))\n\ncallStateCounts.show()",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 19:52:06.678",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 170.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+-----+\n|call_state|count|\n+----------+-----+\n| completed| 9144|\n|      busy|  627|\n|  noanswer|  141|\n|      fail|   57|\n|  canceled|   31|\n+----------+-----+\n\ncallStateCounts: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [call_state: string, count: bigint]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512398065_-826356152",
+      "id": "20190730-184638_375242900",
+      "dateCreated": "2019-07-30 18:46:38.065",
+      "dateStarted": "2019-07-30 19:47:59.098",
+      "dateFinished": "2019-07-30 19:48:16.495",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Use Traditional SQL with OLAP",
+      "text": "%sql\nselect call_state as state, count(*) as count from primer group by call_state order by count DESC",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 19:49:20.300",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 202.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "state": "string",
+                      "count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          },
+          "1": {
+            "graph": {
+              "mode": "table",
+              "height": 86.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "state\tcount\ncompleted\t9144\nbusy\t627\nnoanswer\t141\nfail\t57\ncanceled\t31\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512411234_1760616115",
+      "id": "20190730-184651_1056800044",
+      "dateCreated": "2019-07-30 18:46:51.234",
+      "dateStarted": "2019-07-30 19:48:51.338",
+      "dateFinished": "2019-07-30 19:48:55.601",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Find Percentage of Connected Calls",
+      "text": "%spark\nval totalCalls \u003d df.select(\"call_sid\").distinct().count()\nval totalConnectedCalls \u003d df.where(col(\"connect_duration\").notEqual(0)).select(col(\"call_sid\")).distinct().count()\nval callInfoDf \u003d spark.createDataFrame(Seq((totalCalls, totalConnectedCalls))).toDF(\"total\",\"total_connected\")\nval callInfo \u003d callInfoDf.withColumn(\"percent_connected\", bround(col(\"total_connected\")/col(\"total\"), 2))\n\nval callStatePercentages \u003d callStateCounts.withColumn(\"percent_of_total\", bround(col(\"count\")/lit(totalCalls), 4))\n\ncallStatePercentages.createOrReplaceTempView(\"callstates\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 19:51:26.827",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512506808_-1900829475",
+      "id": "20190730-184826_1867747035",
+      "dateCreated": "2019-07-30 18:48:26.809",
+      "dateStarted": "2019-07-30 19:48:24.303",
+      "dateFinished": "2019-07-30 19:48:40.374",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Graph the CallStates",
+      "text": "%sql\nselect * from callstates",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-01 19:01:38.232",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "call_state": "string",
+                      "count": "string",
+                      "percent_of_total": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "call_state",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "call_state",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "percent_of_total",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "call_state\tcount\tpercent_of_total\ncompleted\t9144\t0.9144\nbusy\t627\t0.0627\nnoanswer\t141\t0.0141\nfail\t57\t0.0057\ncanceled\t31\t0.0031\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564512571312_-1056274613",
+      "id": "20190730-184931_1133903037",
+      "dateCreated": "2019-07-30 18:49:31.312",
+      "dateStarted": "2019-07-30 19:48:40.845",
+      "dateFinished": "2019-07-30 19:48:45.679",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-30 19:48:40.448",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564516120442_-2064753497",
+      "id": "20190730-194840_1300061807",
+      "dateCreated": "2019-07-30 19:48:40.442",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "Signal2019/1_SparkPrimer",
+  "id": "2EHFGMBH5",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

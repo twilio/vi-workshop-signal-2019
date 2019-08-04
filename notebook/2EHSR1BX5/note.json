@@ -1,0 +1,297 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\n# Define Data Model\n| Specify example of Inferring the Schema Using Reflection\n - The case class defines the schema of the table\n - The names of the arguments to the case class are read using reflection and become the names of the columns. \n - Case classes can also be nested or contain complex types such as Seqs or Arrays",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 23:09:35.080",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eDefine Data Model\u003c/h1\u003e\n\u003cp\u003e| Specify example of Inferring the Schema Using Reflection\u003cbr/\u003e - The case class defines the schema of the table\u003cbr/\u003e - The names of the arguments to the case class are read using reflection and become the names of the columns.\u003cbr/\u003e - Case classes can also be nested or contain complex types such as Seqs or Arrays\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610101682_55551164",
+      "id": "20190731-215501_232272402",
+      "dateCreated": "2019-07-31 21:55:01.682",
+      "dateStarted": "2019-07-31 23:09:35.093",
+      "dateFinished": "2019-07-31 23:09:35.134",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nimport org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\nimport org.apache.spark.sql.types._\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.functions._\nimport spark.implicits._\n\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\n// So you don\u0027t need create them manually\n    @SerialVersionUID(100L)\n    case class CallSummaryAPI (\n                call_sid             : String,\n                parent_call_sid      : String,\n                account_sid          : String,\n                parent_account_sid   : String,\n                start_time           : String,\n                end_time             : String,\n                duration             : Int,\n                connect_duration     : Int,\n                call_type            : String,\n                call_state           : String,\n                call_direction       : String,\n                disconnect_by        : String,\n                from                 : Participant,\n                to                   : Participant,\n                processing_state     : String,\n                pdd_ms               : Int,\n                tags                 : Seq[String],\n                properties           : ViProperties,\n                carrier_edge         : EdgeInfo,\n                sip_edge             : EdgeInfo,\n                client_edge          : EdgeInfo,\n                sdk_edge             : EdgeInfo\n            ) extends Serializable\n\n    @SerialVersionUID(100L)\n    case class Participant (\n               caller                : String,\n               callee                : String,\n               carrier               : String,\n               connection            : String,\n               number_prefix         : String,\n               location              : Location,\n               city                  : String,\n               country_code          : String,\n               country_subdivision   : String,\n               ip_address            : String\n           )\n\n    @SerialVersionUID(100L)\n    case class EdgeInfo (\n                properties            : ViProperties,\n                metrics               : MetricsContainer,\n                tags                  : Seq[String]\n            )\n\n    case class ViProperties (\n                last_sip_response_num  : Int,\n                pdd_ms                 : Int,\n                route_id               : String,\n                media_region           : String,\n                signaling_region       : String,\n                twilio_media_ip        : String,\n                twilio_signaling_ip    : String,\n                external_media_ip      : String,\n                external_signaling_ip  : String,\n                sip_call_id            : String,\n                user_agent             : String,\n                selected_region        : String,\n                region                 : String,\n                trunk_sid              : String,\n                diconnectedBy          : String\n            )\n\n    case class Location (\n                lat          : Float \u003d 0.0f,\n                lon          : Float \u003d 0.0f\n            )\n\n    case class MetricsContainer (\n                inbound               : Metric,\n                outbound              : Metric\n            )\n\n    case class Metric (\n                codec_name              : String,\n                packets_received        : Float,\n                packets_sent            : Float,\n                packets_lost            : Float,\n                packets_loss_percentage : Float,\n                jitter                  : Stats,\n                rtt                     : Stats,\n                mos                     : Stats,\n                audio_in                : Stats,\n                audio_out               : Stats,\n                latency                 : Stats,\n                codec                   : Int,\n                packet_delay_variation  : PacketDelayVariation\n            )\n\n    case class Stats (\n                min                     : Float,\n                max                     : Float,\n                avg                     : Float\n            )\n\n    case class PacketDelayVariation (\n                d50                     : Int,\n                d70                     : Int,\n                d90                     : Int,\n                d120                    : Int,\n                d150                    : Int,\n                d200                    : Int,\n                d300                    : Int\n             )",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 23:09:36.617",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\nimport org.apache.spark.sql.types._\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.functions._\nimport spark.implicits._\ndefined class CallSummaryAPI\ndefined class Participant\ndefined class EdgeInfo\ndefined class ViProperties\ndefined class Location\ndefined class MetricsContainer\ndefined class Metric\ndefined class Stats\ndefined class PacketDelayVariation\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610115966_2142533378",
+      "id": "20190731-215515_904493965",
+      "dateCreated": "2019-07-31 21:55:15.966",
+      "dateStarted": "2019-07-31 23:09:36.658",
+      "dateFinished": "2019-07-31 23:09:39.672",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# Encoder:\n-  Serialize the objects for processing or transmitting over the network.\n-  Generate code dynamically and use a format that allows Spark to perform many operations like filtering, sorting and hashing without deserializing the bytes back into an object.",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 23:09:42.140",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eEncoder:\u003c/h1\u003e\n\u003cul\u003e\n  \u003cli\u003eSerialize the objects for processing or transmitting over the network.\u003c/li\u003e\n  \u003cli\u003eGenerate code dynamically and use a format that allows Spark to perform many operations like filtering, sorting and hashing without deserializing the bytes back into an object.\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610128411_-535167308",
+      "id": "20190731-215528_1803562174",
+      "dateCreated": "2019-07-31 21:55:28.411",
+      "dateStarted": "2019-07-31 23:09:42.145",
+      "dateFinished": "2019-07-31 23:09:42.185",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval callSummary: Encoder[CallSummaryAPI] \u003d Encoders.product[CallSummaryAPI]\nval schema \u003d callSummary.schema\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 23:09:44.289",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "callSummary: org.apache.spark.sql.Encoder[CallSummaryAPI] \u003d class[call_sid[0]: string, parent_call_sid[0]: string, account_sid[0]: string, parent_account_sid[0]: string, start_time[0]: string, end_time[0]: string, duration[0]: int, connect_duration[0]: int, call_type[0]: string, call_state[0]: string, call_direction[0]: string, disconnect_by[0]: string, from[0]: struct\u003ccaller:string,callee:string,carrier:string,connection:string,number_prefix:string,location:struct\u003clat:float,lon:float\u003e,city:string,country_code:string,country_subdivision:string,ip_address:string\u003e, to[0]: struct\u003ccaller:string,callee:string,carrier:string,connection:string,number_prefix:string,location:struct\u003clat:float,lon:float\u003e,city:string,country_code:string,country_subdivision:string,ip_address:string\u003e, processing_stat..."
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610132364_1770638828",
+      "id": "20190731-215532_1260447978",
+      "dateCreated": "2019-07-31 21:55:32.364",
+      "dateStarted": "2019-07-31 23:09:44.322",
+      "dateFinished": "2019-07-31 23:09:48.041",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval df \u003d spark.read.schema(schema).parquet(\"hdfs://namenode:8020/voiceinsights/signal2019/data/signal-call-summary-data-xs.parquet\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 23:09:49.766",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "df: org.apache.spark.sql.DataFrame \u003d [call_sid: string, parent_call_sid: string ... 20 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610142095_178362308",
+      "id": "20190731-215542_1907200484",
+      "dateCreated": "2019-07-31 21:55:42.095",
+      "dateStarted": "2019-07-31 23:09:49.807",
+      "dateFinished": "2019-07-31 23:09:50.492",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval table \u003d df.createOrReplaceTempView(\"calls_api_v2\")\n\n// describe calls api\nspark.sql(\"describe calls_api_v2\").show()",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 21:58:15.123",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610175581_1288431103",
+      "id": "20190731-215615_1757522322",
+      "dateCreated": "2019-07-31 21:56:15.582",
+      "dateStarted": "2019-07-31 21:58:15.269",
+      "dateFinished": "2019-07-31 21:58:19.542",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\n// Total Rows\nval totalRows \u003d spark.sql(\"select count(call_sid) from calls_api_v2\")\ntotalRows.show(false)",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 21:58:19.582",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610187002_694577901",
+      "id": "20190731-215627_1345002468",
+      "dateCreated": "2019-07-31 21:56:27.002",
+      "dateStarted": "2019-07-31 21:58:19.913",
+      "dateFinished": "2019-07-31 21:58:40.060",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\n// Joins \n// UDF\n// Windowing",
+      "user": "anonymous",
+      "dateUpdated": "2019-07-31 21:58:45.450",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {}
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1564610299583_-842033338",
+      "id": "20190731-215819_1872542268",
+      "dateCreated": "2019-07-31 21:58:19.583",
+      "status": "READY",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "Signal2019/2_1_DataEngineering",
+  "id": "2EHSR1BX5",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}

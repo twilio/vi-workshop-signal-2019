@@ -1,0 +1,1076 @@
+{
+  "paragraphs": [
+    {
+      "title": "Voice Insights Data Loading",
+      "text": "%spark\nval df \u003d spark.read.parquet(\"hdfs://namenode:8020/voiceinsights/signal2019/data/signal-call-summary-data-xs.parquet\")\ndf.printSchema\ndf.schema.toDDL",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:24:10.580",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- call_sid: string (nullable \u003d true)\n |-- parent_call_sid: string (nullable \u003d true)\n |-- account_sid: string (nullable \u003d true)\n |-- parent_account_sid: string (nullable \u003d true)\n |-- start_time: string (nullable \u003d true)\n |-- end_time: string (nullable \u003d true)\n |-- duration: integer (nullable \u003d true)\n |-- connect_duration: integer (nullable \u003d true)\n |-- call_type: string (nullable \u003d true)\n |-- call_state: string (nullable \u003d true)\n |-- call_direction: string (nullable \u003d true)\n |-- disconnect_by: string (nullable \u003d true)\n |-- from: struct (nullable \u003d true)\n |    |-- caller: string (nullable \u003d true)\n |    |-- callee: string (nullable \u003d true)\n |    |-- carrier: string (nullable \u003d true)\n |    |-- connection: string (nullable \u003d true)\n |    |-- number_prefix: string (nullable \u003d true)\n |    |-- location: struct (nullable \u003d true)\n |    |    |-- lat: float (nullable \u003d true)\n |    |    |-- lon: float (nullable \u003d true)\n |    |-- city: string (nullable \u003d true)\n |    |-- country_code: string (nullable \u003d true)\n |    |-- country_subdivision: string (nullable \u003d true)\n |    |-- ip_address: string (nullable \u003d true)\n |-- to: struct (nullable \u003d true)\n |    |-- caller: string (nullable \u003d true)\n |    |-- callee: string (nullable \u003d true)\n |    |-- carrier: string (nullable \u003d true)\n |    |-- connection: string (nullable \u003d true)\n |    |-- number_prefix: string (nullable \u003d true)\n |    |-- location: struct (nullable \u003d true)\n |    |    |-- lat: float (nullable \u003d true)\n |    |    |-- lon: float (nullable \u003d true)\n |    |-- city: string (nullable \u003d true)\n |    |-- country_code: string (nullable \u003d true)\n |    |-- country_subdivision: string (nullable \u003d true)\n |    |-- ip_address: string (nullable \u003d true)\n |-- processing_state: string (nullable \u003d true)\n |-- pdd_ms: integer (nullable \u003d true)\n |-- tags: array (nullable \u003d true)\n |    |-- element: string (containsNull \u003d true)\n |-- properties: struct (nullable \u003d true)\n |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |-- pdd_ms: integer (nullable \u003d true)\n |    |-- route_id: string (nullable \u003d true)\n |    |-- media_region: string (nullable \u003d true)\n |    |-- signaling_region: string (nullable \u003d true)\n |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |-- external_media_ip: string (nullable \u003d true)\n |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |-- sip_call_id: string (nullable \u003d true)\n |    |-- user_agent: string (nullable \u003d true)\n |    |-- selected_region: string (nullable \u003d true)\n |    |-- region: string (nullable \u003d true)\n |    |-- trunk_sid: string (nullable \u003d true)\n |-- carrier_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n |-- sip_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n |-- client_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n |-- sdk_edge: struct (nullable \u003d true)\n |    |-- properties: struct (nullable \u003d true)\n |    |    |-- last_sip_response_num: integer (nullable \u003d true)\n |    |    |-- pdd_ms: integer (nullable \u003d true)\n |    |    |-- route_id: string (nullable \u003d true)\n |    |    |-- media_region: string (nullable \u003d true)\n |    |    |-- signaling_region: string (nullable \u003d true)\n |    |    |-- twilio_media_ip: string (nullable \u003d true)\n |    |    |-- twilio_signaling_ip: string (nullable \u003d true)\n |    |    |-- external_media_ip: string (nullable \u003d true)\n |    |    |-- external_signaling_ip: string (nullable \u003d true)\n |    |    |-- sip_call_id: string (nullable \u003d true)\n |    |    |-- user_agent: string (nullable \u003d true)\n |    |    |-- selected_region: string (nullable \u003d true)\n |    |    |-- region: string (nullable \u003d true)\n |    |    |-- trunk_sid: string (nullable \u003d true)\n |    |-- metrics: struct (nullable \u003d true)\n |    |    |-- inbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |    |-- outbound: struct (nullable \u003d true)\n |    |    |    |-- codec_name: string (nullable \u003d true)\n |    |    |    |-- packets_received: float (nullable \u003d true)\n |    |    |    |-- packets_sent: float (nullable \u003d true)\n |    |    |    |-- packets_lost: float (nullable \u003d true)\n |    |    |    |-- packets_loss_percentage: float (nullable \u003d true)\n |    |    |    |-- jitter: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- rtt: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- mos: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_in: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- audio_out: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- latency: struct (nullable \u003d true)\n |    |    |    |    |-- min: float (nullable \u003d true)\n |    |    |    |    |-- max: float (nullable \u003d true)\n |    |    |    |    |-- avg: float (nullable \u003d true)\n |    |    |    |-- codec: integer (nullable \u003d true)\n |    |    |    |-- packet_delay_variation: struct (nullable \u003d true)\n |    |    |    |    |-- d50: integer (nullable \u003d true)\n |    |    |    |    |-- d70: integer (nullable \u003d true)\n |    |    |    |    |-- d90: integer (nullable \u003d true)\n |    |    |    |    |-- d120: integer (nullable \u003d true)\n |    |    |    |    |-- d150: integer (nullable \u003d true)\n |    |    |    |    |-- d200: integer (nullable \u003d true)\n |    |    |    |    |-- d300: integer (nullable \u003d true)\n |    |-- tags: array (nullable \u003d true)\n |    |    |-- element: string (containsNull \u003d true)\n\ndf: org.apache.spark.sql.DataFrame \u003d [call_sid: string, parent_call_sid: string ... 20 more fields]\nres1: String \u003d `call_sid` STRING,`parent_call_sid` STRING,`account_sid` STRING,`parent_account_sid` STRING,`start_time` STRING,`end_time` STRING,`duration` INT,`connect_duration` INT,`call_type` STRING,`call_state` STRING,`call_direction` STRING,`disconnect_by` STRING,`from` STRUCT\u003c`caller`: STRING, `callee`: STRING, `carrier`: STRING, `connection`: STRING, `number_prefix`: STRING, `location`: STRUCT\u003c`lat`: FLOAT, `lon`: FLOAT\u003e, `city`: STRING, `country_code`: STRING, `country_subdivision`: STRING, `ip_address`: STRING\u003e,`to` STRUCT\u003c`caller`: STRING, `callee`: STRING, `carrier`: STRING, `connection`: STRING, `number_prefix`: STRING, `location`: STRUCT\u003c`lat`: FLOAT, `lon`: FLOAT\u003e, `city`: S..."
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d0"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564686058861_-417835723",
+      "id": "20190801-190058_1427717213",
+      "dateCreated": "2019-08-01 19:00:58.861",
+      "dateStarted": "2019-08-03 21:24:10.739",
+      "dateFinished": "2019-08-03 21:24:52.992",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\ndf.createOrReplaceTempView(\"voiceinsights\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:24:53.054",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "jobName": "paragraph_1564686340703_-396216275",
+      "id": "20190801-190540_1948462897",
+      "dateCreated": "2019-08-01 19:05:40.703",
+      "dateStarted": "2019-08-03 21:24:53.361",
+      "dateFinished": "2019-08-03 21:24:55.057",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from voiceinsights limit 10",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:24:55.085",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "call_sid": "string",
+                      "parent_call_sid": "string",
+                      "account_sid": "string",
+                      "parent_account_sid": "string",
+                      "start_time": "string",
+                      "end_time": "string",
+                      "duration": "string",
+                      "connect_duration": "string",
+                      "call_type": "string",
+                      "call_state": "string",
+                      "call_direction": "string",
+                      "disconnect_by": "string",
+                      "from": "string",
+                      "to": "string",
+                      "processing_state": "string",
+                      "pdd_ms": "string",
+                      "tags": "string",
+                      "properties": "string",
+                      "carrier_edge": "string",
+                      "sip_edge": "string",
+                      "client_edge": "string",
+                      "sdk_edge": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "call_sid\tparent_call_sid\taccount_sid\tparent_account_sid\tstart_time\tend_time\tduration\tconnect_duration\tcall_type\tcall_state\tcall_direction\tdisconnect_by\tfrom\tto\tprocessing_state\tpdd_ms\ttags\tproperties\tcarrier_edge\tsip_edge\tclient_edge\tsdk_edge\nCA8c4ff581136978e387d76a53ea2bb10a\t\tACo32nop9p5m636klmk9m9pppm981n9n88\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:18:12Z\t2019-07-28T20:19:13Z\t6100\t6100\tcarrier\tcompleted\toutbound_api\tcaller\t[+16007008000,+17005002000,O1 Communications,landline,1818,[34.186115,-118.43555],,US,,null]\t[+16007008000,+17005002000,,pstn,1201,[40.83885,-74.04568],,US,,null]\tcomplete\t91\tWrappedArray(silence)\t[200,91,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\t[[0,0,,unknown_realm,unknown_realm,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,unknown_realm,unknown_realm,],[[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]],[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\tnull\nCA13d3c96aa022373d9245248d6eeb11a0\t\tACo32nop9p5m636klmk9m9pppm981n9n88\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:18:14Z\t2019-07-28T20:19:15Z\t6100\t6100\tcarrier\tcompleted\toutbound_api\tcaller\t[+16007008000,+17005002000,T-Mobile USA, Inc. (form. Metro PCS, Inc.),mobile,1205,[33.42767,-86.886475],,US,,null]\t[+16007008000,+17005002000,Onvoy, LLC,landline,1205,[33.42767,-86.886475],,US,,null]\tcomplete\t78\tWrappedArray(silence)\t[200,78,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\t[[0,0,,unknown_realm,unknown_realm,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,unknown_realm,unknown_realm,],[[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]],[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\tnull\nCAe5d2a4afdf671797ce5fdefae1d4d14a\t\tACol66m9pl4n3o27n489k1k7n3ppn64719\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:19:45Z\t2019-07-28T20:19:45Z\t0\t0\tcarrier\tcompleted\tinbound\tunknown_disconnected_by\t[+16007008000,+17005002000,T-Mobile USA, Inc.,mobile,1201,[40.83885,-74.04568],,US,,null]\t[+16007008000,+17005002000,,pstn,1201,[40.83885,-74.04568],,US,,null]\tcomplete\t80\tWrappedArray()\t[603,80,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\t[[0,0,,unknown_realm,unknown_realm,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,unknown_realm,unknown_realm,],[[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]],[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\tnull\nCAf14e0fe6204e4ece9f294b526118cbab\t\tACol66m9pl4n3o27n489k1k7n3ppn64719\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:19:22Z\t2019-07-28T20:19:46Z\t2400\t2400\tcarrier\tcompleted\toutbound_api\tcaller\t[+16007008000,+17005002000,Verizon,landline,1201,[40.83885,-74.04568],,US,,null]\t[+16007008000,+17005002000,Level 3 Communications, LLC,landline,1201,[40.83885,-74.04568],,US,,null]\tcomplete\t96\tWrappedArray()\t[200,96,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\t[[0,0,,unknown_realm,unknown_realm,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,unknown_realm,unknown_realm,],[[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]],[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\tnull\nCAa716c7e1effc7311c85069df6dfe070c\t\tAC2k999m28noo26n81mm771ml84569lpmo\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:19:41Z\t2019-07-28T20:19:47Z\t600\t600\tsip\tcompleted\toutbound_api\tcallee\t[+16007008000,+17005002000,Sprint Spectrum, L.P.,mobile,1201,[40.83885,-74.04568],,US,,null]\t[+16007008000,+17005002000,,sip_interface,,[0.0,0.0],,,,null]\tcomplete\t184\tWrappedArray()\t[200,184,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\tnull\t[[200,184,,us1,us1,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,us1,unknown_realm,],[[pcmu,184.0,0.0,0.0,0.0,[0.0,0.5923,0.298051],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],1,[0,0,0,0,0,0,0]],[pcmu,0.0,229.0,0.0,0.0,[0.0,0.391094,0.237078],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],1,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\nCA616765f5270cce2fb29398a731b5e415\t\tAC2k999m28noo26n81mm771ml84569lpmo\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:19:11Z\t2019-07-28T20:19:56Z\t4500\t4500\tcarrier\tcompleted\tinbound\tcaller\t[+16007008000,+17005002000,,pstn,1201,[40.83885,-74.04568],,US,,null]\t[+16007008000,+17005002000,AT\u0026T Wireless,mobile,1201,[40.83885,-74.04568],,US,,null]\tcomplete\t76\tWrappedArray(silence)\t[200,76,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\t[[0,0,,unknown_realm,unknown_realm,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,unknown_realm,unknown_realm,],[[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]],[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\tnull\nCA4937a423f1e11d1ee142d81a1dbbf48e\t\tAC2k999m28noo26n81mm771ml84569lpmo\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:19:31Z\t2019-07-28T20:20:01Z\t3000\t3000\tcarrier\tcompleted\tinbound\tcaller\t[+16007008000,+17005002000,Hawaiian Telcom, Inc. - HI,landline,1808,[20.956036,-157.23793],,US,,null]\t[+16007008000,+17005002000,,pstn,1201,[40.83885,-74.04568],,US,,null]\tcomplete\t103\tWrappedArray()\t[200,103,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\t[[0,0,,unknown_realm,unknown_realm,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,unknown_realm,unknown_realm,],[[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]],[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\tnull\nCA4abdb8a956d7edb0cf0445ea970b529f\t\tAC999m21l79mlpnk9p78388p8n9p5549m9\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:20:10Z\t2019-07-28T20:20:10Z\t0\t0\tclient\tbusy\toutbound_api\tunknown_disconnected_by\t[+16007008000,+17005002000,,twilio_sdk,,[0.0,0.0],,,,null]\t[+16007008000,+17005002000,,twilio_sdk,,[0.0,0.0],,,,null]\tcomplete\t22\tWrappedArray()\t[600,22,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\tnull\tnull\t[[0,0,,unknown_realm,unknown_realm,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,,unknown_realm,unknown_realm,],[[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]],[unknown_codec_name,0.0,0.0,0.0,0.0,[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],0,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\nCAca035dc61300c585516391f50301ec31\t\tAC2k999m28noo26n81mm771ml84569lpmo\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:19:57Z\t2019-07-28T20:20:20Z\t2200\t2300\tsip\tcompleted\tinbound\tcaller\t[+16007008000,+17005002000,,sip_interface,,[0.0,0.0],,,,null]\t[+16007008000,+17005002000,,sip_interface,,[0.0,0.0],,,,null]\tcomplete\t80\tWrappedArray()\t[200,80,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\tnull\t[[200,80,,us1,us1,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,Asterisk PBX UNKNOWN__and_probably_unsupported,us1,unknown_realm,],[[pcmu,1097.0,0.0,0.0,0.0,[0.0,0.462429,0.130689],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],1,[0,0,0,0,0,0,0]],[pcmu,0.0,1067.0,0.0,0.0,[0.0,0.274806,0.0451768],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,65.945,65.945],1,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\nCA971b4d7c5061b23b50a4730b85dc6482\t\tAC2k999m28noo26n81mm771ml84569lpmo\tAC0ppppppppppppppppppppppppppppppp\t2019-07-28T20:20:17Z\t2019-07-28T20:20:23Z\t600\t600\tsip\tcompleted\tinbound\tcallee\t[+16007008000,+17005002000,,sip_interface,,[0.0,0.0],,,,null]\t[+16007008000,+17005002000,,sip_interface,,[0.0,0.0],,,,null]\tcomplete\t51\tWrappedArray()\t[200,51,,unknown_realm,unknown_realm,null,null,198.162.100.1,198.162.243.1,null,null,null,null,null]\tnull\t[[200,51,,us1,us1,198.162.100.1,198.162.100.2,198.162.240.1,198.162.240.2,,Asterisk PBX UNKNOWN__and_probably_unsupported,us1,unknown_realm,],[[pcmu,229.0,0.0,0.0,0.0,[0.0,0.451501,0.225867],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],1,[0,0,0,0,0,0,0]],[pcmu,0.0,184.0,0.0,0.0,[0.0,0.451096,0.25386],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],[0.0,0.0,0.0],1,[0,0,0,0,0,0,0]]],WrappedArray()]\tnull\tnull\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d1"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564686370324_1288654270",
+      "id": "20190801-190610_845661951",
+      "dateCreated": "2019-08-01 19:06:10.324",
+      "dateStarted": "2019-08-03 21:24:55.290",
+      "dateFinished": "2019-08-03 21:25:04.468",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\n/* use the spark DSL to create a projection (equiv to select fieldA, fieldB, fieldC from table in SQL) */\n\nval projectedData \u003d df.select(\n    \"parent_account_sid\",\n    \"account_sid\",\n    \"call_sid\",\n    \"end_time\",\n    \"call_type\",\n    \"call_state\",\n    \"call_direction\",\n    \"duration\",\n    \"connect_duration\",\n    \"properties.last_sip_response_num\"\n)\nprojectedData.printSchema",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:25:04.547",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- parent_account_sid: string (nullable \u003d true)\n |-- account_sid: string (nullable \u003d true)\n |-- call_sid: string (nullable \u003d true)\n |-- end_time: string (nullable \u003d true)\n |-- call_type: string (nullable \u003d true)\n |-- call_state: string (nullable \u003d true)\n |-- call_direction: string (nullable \u003d true)\n |-- duration: integer (nullable \u003d true)\n |-- connect_duration: integer (nullable \u003d true)\n |-- last_sip_response_num: integer (nullable \u003d true)\n\nprojectedData: org.apache.spark.sql.DataFrame \u003d [parent_account_sid: string, account_sid: string ... 8 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564686148338_1215155224",
+      "id": "20190801-190228_37010667",
+      "dateCreated": "2019-08-01 19:02:28.338",
+      "dateStarted": "2019-08-03 21:25:04.947",
+      "dateFinished": "2019-08-03 21:25:06.713",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Adding Columns to DateFrame (decode iso as timestamp from end_time of call)",
+      "text": "%spark\n/* if we want to use the end_time of the call as a timestamp we need to convert */\n/* end_time\u003dISO8601 format -\u003e convert to timestamp type */\n\nval projectedDataWithTime \u003d projectedData\n    .withColumn(\"timestamp\", to_timestamp(col(\"end_time\")))\n\nprojectedDataWithTime.printSchema",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:25:06.716",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- parent_account_sid: string (nullable \u003d true)\n |-- account_sid: string (nullable \u003d true)\n |-- call_sid: string (nullable \u003d true)\n |-- end_time: string (nullable \u003d true)\n |-- call_type: string (nullable \u003d true)\n |-- call_state: string (nullable \u003d true)\n |-- call_direction: string (nullable \u003d true)\n |-- duration: integer (nullable \u003d true)\n |-- connect_duration: integer (nullable \u003d true)\n |-- last_sip_response_num: integer (nullable \u003d true)\n |-- timestamp: timestamp (nullable \u003d true)\n\nprojectedDataWithTime: org.apache.spark.sql.DataFrame \u003d [parent_account_sid: string, account_sid: string ... 9 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564686689611_1964415661",
+      "id": "20190801-191129_1655459771",
+      "dateCreated": "2019-08-01 19:11:29.611",
+      "dateStarted": "2019-08-03 21:25:07.159",
+      "dateFinished": "2019-08-03 21:25:08.391",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Adding DateTime information (prepare for windowing)",
+      "text": "%spark\n/* having a timestamp is nice. what if we want to add the year, month, day to the projection? */\nval projectedDataWithTimeAndDate \u003d projectedDataWithTime\n    .withColumn(\"year\", year(col(\"timestamp\")))\n    .withColumn(\"month\", month(col(\"timestamp\")))\n    .withColumn(\"day\", dayofmonth(col(\"timestamp\")))\n\nprojectedDataWithTimeAndDate.printSchema\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:25:08.481",
+      "config": {
+        "colWidth": 6.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- parent_account_sid: string (nullable \u003d true)\n |-- account_sid: string (nullable \u003d true)\n |-- call_sid: string (nullable \u003d true)\n |-- end_time: string (nullable \u003d true)\n |-- call_type: string (nullable \u003d true)\n |-- call_state: string (nullable \u003d true)\n |-- call_direction: string (nullable \u003d true)\n |-- duration: integer (nullable \u003d true)\n |-- connect_duration: integer (nullable \u003d true)\n |-- last_sip_response_num: integer (nullable \u003d true)\n |-- timestamp: timestamp (nullable \u003d true)\n |-- year: integer (nullable \u003d true)\n |-- month: integer (nullable \u003d true)\n |-- day: integer (nullable \u003d true)\n\nprojectedDataWithTimeAndDate: org.apache.spark.sql.DataFrame \u003d [parent_account_sid: string, account_sid: string ... 12 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564687225988_778258041",
+      "id": "20190801-192025_2060244150",
+      "dateCreated": "2019-08-01 19:20:25.988",
+      "dateStarted": "2019-08-03 21:25:08.730",
+      "dateFinished": "2019-08-03 21:25:09.233",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\n/* cache off this transformation (lazy caching in spark) */\nprojectedDataWithTimeAndDate.cache()\n/* force cache by running an action on the dataframe */\nprojectedDataWithTimeAndDate.count\n\n/* now look at the summary statistics of some of the columns */\n\nval aggregated \u003d projectedDataWithTimeAndDate\n    .groupBy(\"account_sid\")\n    .agg(\n        count(col(\"call_sid\")) as \"total\",\n        min(col(\"connect_duration\")) as \"min_connect_duration\",\n        avg(col(\"connect_duration\")) as \"avg_connect_duration\",\n        max(col(\"connect_duration\")) as \"max_connect_duration\"\n    )\n    .sort(desc(\"total\"))\n\naggregated.createOrReplaceTempView(\"basicagg\")\n\naggregated.printSchema",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:25:09.289",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- account_sid: string (nullable \u003d true)\n |-- total: long (nullable \u003d false)\n |-- min_connect_duration: integer (nullable \u003d true)\n |-- avg_connect_duration: double (nullable \u003d true)\n |-- max_connect_duration: integer (nullable \u003d true)\n\naggregated: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] \u003d [account_sid: string, total: bigint ... 3 more fields]\n"
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d2"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564687409172_-515784766",
+      "id": "20190801-192329_374620489",
+      "dateCreated": "2019-08-01 19:23:29.172",
+      "dateStarted": "2019-08-03 21:25:09.564",
+      "dateFinished": "2019-08-03 21:25:16.467",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Looking where things Line Up",
+      "text": "%sql\nselect * from basicagg",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:25:16.546",
+      "config": {
+        "colWidth": 4.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "account_sid": "string",
+                      "total": "string",
+                      "min_connect_duration": "string",
+                      "avg_connect_duration": "string",
+                      "max_connect_duration": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "scatterChart": {
+                  "xAxis": {
+                    "name": "avg_connect_duration",
+                    "index": 3.0,
+                    "aggr": "sum"
+                  },
+                  "yAxis": {
+                    "name": "total",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  },
+                  "size": {
+                    "name": "total",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  }
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "lineChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "keys": [
+                {
+                  "name": "account_sid",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "total",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "account_sid\ttotal\tmin_connect_duration\tavg_connect_duration\tmax_connect_duration\nACol66m9pl4n3o27n489k1k7n3ppn64719\t2038\t0\t1971.3935230618254\t9800\nACkm613135mm17ok11mnkl79mpl38599n1\t2029\t0\t2008.3785115820601\t9800\nAC2k999m28noo26n81mm771ml84569lpmo\t2020\t0\t1960.7920792079208\t9800\nACk6326n554mk3m79l9842799991op5l31\t2017\t0\t1903.9167079821518\t9800\nAC999m21l79mlpnk9p78388p8n9p5549m9\t1043\t0\t44.103547459252155\t3700\nAC5mm9plnm5m7o63729947po368mo1k7m9\t270\t0\t3299.259259259259\t6500\nAC9po3p85k475o1832lm514o9244m45np8\t161\t100\t131.055900621118\t200\nAC89192nn66mo75o94pp793nm2n2n79p6p\t136\t0\t1625.735294117647\t19500\nACo32nop9p5m636klmk9m9pppm981n9n88\t106\t0\t4373.584905660377\t6100\nACk3l37m25ko158483n6l955p86p988282\t53\t3100\t3164.1509433962265\t3300\nACo3263mlpo8po6nm53947n5n8k487pn46\t30\t100\t1473.3333333333333\t2900\nACokol6l9992pkm9mk99n22277o1545n26\t19\t600\t731.578947368421\t1000\nAC1kn97nk94n833lp78kpmoo7l7381moo1\t16\t0\t2143.75\t5900\nAC392kp3m69577l8ln4l8p6mm6n98nn5n4\t12\t200\t208.33333333333334\t300\nACllllllllllllllllllllllllllllllll\t11\t0\t0.0\t0\nACln39125836o6nok2l61n6k9186264k28\t10\t200\t250.0\t300\nAClk514p5n4nno2o7p3l34535322mnk82p\t7\t100\t100.0\t100\nACk26793m64136m897p563ln8k92lom118\t6\t100\t166.66666666666666\t300\nACo3361p7896lpm3l4ko218669993p738k\t6\t200\t216.66666666666666\t300\nAC8npm9nk67p3n5p9925n3899l4271523o\t5\t200\t280.0\t300\nACk1317l2o3k42469629734pl5oln24o1p\t2\t0\t10950.0\t21900\nAC4pl8l18n76pk9287p6p8l1279l8m56l8\t2\t200\t200.0\t200\nAC84p9o65m13k82nmm9164423312no1nk3\t1\t1381300\t1381300.0\t1381300\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d3"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564687819490_-776951791",
+      "id": "20190801-193019_1223587817",
+      "dateCreated": "2019-08-01 19:30:19.490",
+      "dateStarted": "2019-08-03 21:25:16.804",
+      "dateFinished": "2019-08-03 21:25:27.283",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Removing Whales",
+      "text": "%sql\nselect * from basicagg\nwhere total \u003e 100",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:25:27.293",
+      "config": {
+        "colWidth": 4.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "account_sid": "string",
+                      "total": "string",
+                      "min_connect_duration": "string",
+                      "avg_connect_duration": "string",
+                      "max_connect_duration": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "scatterChart": {
+                  "xAxis": {
+                    "name": "avg_connect_duration",
+                    "index": 3.0,
+                    "aggr": "sum"
+                  },
+                  "yAxis": {
+                    "name": "total",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  },
+                  "size": {
+                    "name": "total",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  }
+                }
+              }
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "account_sid\ttotal\tmin_connect_duration\tavg_connect_duration\tmax_connect_duration\nACol66m9pl4n3o27n489k1k7n3ppn64719\t2038\t0\t1971.3935230618254\t9800\nACkm613135mm17ok11mnkl79mpl38599n1\t2029\t0\t2008.3785115820601\t9800\nAC2k999m28noo26n81mm771ml84569lpmo\t2020\t0\t1960.7920792079208\t9800\nACk6326n554mk3m79l9842799991op5l31\t2017\t0\t1903.9167079821518\t9800\nAC999m21l79mlpnk9p78388p8n9p5549m9\t1043\t0\t44.103547459252155\t3700\nAC5mm9plnm5m7o63729947po368mo1k7m9\t270\t0\t3299.259259259259\t6500\nAC9po3p85k475o1832lm514o9244m45np8\t161\t100\t131.055900621118\t200\nAC89192nn66mo75o94pp793nm2n2n79p6p\t136\t0\t1625.735294117647\t19500\nACo32nop9p5m636klmk9m9pppm981n9n88\t106\t0\t4373.584905660377\t6100\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d4"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564688171195_1539392051",
+      "id": "20190801-193611_1057533351",
+      "dateCreated": "2019-08-01 19:36:11.195",
+      "dateStarted": "2019-08-03 21:25:27.423",
+      "dateFinished": "2019-08-03 21:25:33.754",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Look through new lense",
+      "text": "%sql\nselect * from basicagg\nwhere total \u003e 100\nand avg_connect_duration \u003c 46",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:25:33.834",
+      "config": {
+        "colWidth": 4.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "scatterChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "scatterChart": {
+                  "xAxis": {
+                    "name": "avg_connect_duration",
+                    "index": 3.0,
+                    "aggr": "sum"
+                  },
+                  "yAxis": {
+                    "name": "total",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  },
+                  "size": {
+                    "name": "total",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  }
+                }
+              }
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "account_sid\ttotal\tmin_connect_duration\tavg_connect_duration\tmax_connect_duration\nAC999m21l79mlpnk9p78388p8n9p5549m9\t1043\t0\t44.103547459252155\t3700\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d5"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564688402310_1595808269",
+      "id": "20190801-194002_1435154381",
+      "dateCreated": "2019-08-01 19:40:02.310",
+      "dateStarted": "2019-08-03 21:25:34.009",
+      "dateFinished": "2019-08-03 21:25:39.672",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nval lastSipResponseNumbers \u003d projectedDataWithTimeAndDate\n    .select(\"call_sid\",\"last_sip_response_num\", \"connect_duration\")\n    .groupBy(\"last_sip_response_num\")\n    .agg(\n        count(col(\"call_sid\")) as \"total\",\n        sum(col(\"connect_duration\") / 60) as \"connected_minutes\"\n    )",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:33:00.310",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "lastSipResponseNumbers: org.apache.spark.sql.DataFrame \u003d [last_sip_response_num: int, total: bigint ... 1 more field]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564867429873_-1189630570",
+      "id": "20190803-212349_1435740459",
+      "dateCreated": "2019-08-03 21:23:49.873",
+      "dateStarted": "2019-08-03 21:33:00.402",
+      "dateFinished": "2019-08-03 21:33:01.162",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\nlastSipResponseNumbers.createOrReplaceTempView(\"responsecodes\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:34:45.840",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "jobName": "paragraph_1564867612370_-2125238879",
+      "id": "20190803-212652_1252615960",
+      "dateCreated": "2019-08-03 21:26:52.370",
+      "dateStarted": "2019-08-03 21:33:03.740",
+      "dateFinished": "2019-08-03 21:33:04.268",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from responsecodes\nwhere last_sip_response_num \u003e 0\norder by total desc",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:38:23.290",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "last_sip_response_num": "string",
+                      "total": "string",
+                      "connected_seconds": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "scatterChart": {
+                  "group": {
+                    "name": "last_sip_response_num",
+                    "index": 0.0,
+                    "aggr": "sum"
+                  },
+                  "yAxis": {
+                    "name": "last_sip_response_num",
+                    "index": 0.0,
+                    "aggr": "sum"
+                  },
+                  "size": {
+                    "name": "total",
+                    "index": 1.0,
+                    "aggr": "sum"
+                  },
+                  "xAxis": {
+                    "name": "connected_minutes",
+                    "index": 2.0,
+                    "aggr": "sum"
+                  }
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "rotate",
+                  "stacked": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "last_sip_response_num",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "last_sip_response_num",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "total",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "last_sip_response_num\ttotal\tconnected_minutes\n200\t8957\t318993.3333333333\n600\t476\t0.0\n603\t189\t231.6666666666666\n487\t162\t595.0\n486\t92\t6.666666666666667\n404\t30\t0.0\n500\t14\t0.0\n408\t14\t0.0\n477\t8\t230.0\n481\t4\t96.66666666666667\n484\t4\t1.6666666666666667\n410\t2\t0.0\n480\t1\t1.6666666666666667\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d10"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564867646229_-542115962",
+      "id": "20190803-212726_741012503",
+      "dateCreated": "2019-08-03 21:27:26.229",
+      "dateStarted": "2019-08-03 21:34:09.203",
+      "dateFinished": "2019-08-03 21:34:13.672",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\n/* https://www.iana.org/assignments/sip-parameters/sip-parameters.xhtml#sip-parameters-7 */\nimport spark.implicits._\nimport org.apache.spark.sql.functions._\n\ncase class SipCode(code: Int, description: String)\nval sipCodes \u003d Seq(\n    SipCode(200, \"OK\"),\n    SipCode(404, \"Not Found\"),\n    SipCode(408, \"Request Timeout\"),\n    SipCode(410, \"Gone\"),\n    SipCode(477, \"Transport Layer Issue\"),\n    SipCode(480, \"Temporarily Unavailable\"),\n    SipCode(481, \"Call or Transaction Doesn\u0027t Exist\"),\n    SipCode(484, \"Address Incomplete\"),\n    SipCode(486, \"Busy Here\"),\n    SipCode(487, \"Request Terminated / Canceled\"),\n    SipCode(500, \"Server Internal Error\"),\n    SipCode(600, \"Busy Everywhere\"),\n    SipCode(603, \"Declined\")\n    )\n// make a dataframe\nval sipCodesDf \u003d spark.createDataFrame[SipCode](sipCodes)\nsipCodesDf.createOrReplaceTempView(\"sipcodes\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:46:48.006",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import spark.implicits._\nimport org.apache.spark.sql.functions._\ndefined class SipCode\nsipCodes: Seq[SipCode] \u003d List(SipCode(200,OK), SipCode(404,Not Found), SipCode(408,Request Timeout), SipCode(410,Gone), SipCode(477,Transport Layer Issue), SipCode(480,Temporarily Unavailable), SipCode(481,Call or Transaction Doesn\u0027t Exist), SipCode(484,Address Incomplete), SipCode(486,Busy Here), SipCode(487,Request Terminated / Canceled), SipCode(500,Server Internal Error), SipCode(600,Busy Everywhere), SipCode(603,Declined))\nsipCodesDf: org.apache.spark.sql.DataFrame \u003d [code: int, description: string]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564867665310_1302769268",
+      "id": "20190803-212745_383249652",
+      "dateCreated": "2019-08-03 21:27:45.310",
+      "dateStarted": "2019-08-03 21:46:05.371",
+      "dateFinished": "2019-08-03 21:46:09.928",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%spark\n/* Joining two DataFrames to enhance the data */\nval projectionWithSipInformation \u003d lastSipResponseNumbers\n    .join(sipCodesDf, col(\"last_sip_response_num\") \u003d\u003d\u003d col(\"code\"), \"inner\")\n    .drop(\"code\")\n    .withColumnRenamed(\"description\", \"sip_response_description\")\n\nprojectionWithSipInformation.printSchema\nprojectionWithSipInformation.createOrReplaceTempView(\"responsecodeswithdesc\")",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:54:12.800",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- last_sip_response_num: integer (nullable \u003d true)\n |-- total: long (nullable \u003d false)\n |-- connected_minutes: double (nullable \u003d true)\n |-- sip_response_description: string (nullable \u003d true)\n\nprojectionWithSipInformation: org.apache.spark.sql.DataFrame \u003d [last_sip_response_num: int, total: bigint ... 2 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1564868765272_-1920333858",
+      "id": "20190803-214605_640165398",
+      "dateCreated": "2019-08-03 21:46:05.272",
+      "dateStarted": "2019-08-03 21:54:12.910",
+      "dateFinished": "2019-08-03 21:54:13.825",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from responsecodeswithdesc order by total desc",
+      "user": "anonymous",
+      "dateUpdated": "2019-08-03 21:54:51.334",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "last_sip_response_num": "string",
+                      "total": "string",
+                      "connected_minutes": "string",
+                      "sip_response_description": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "last_sip_response_num\ttotal\tconnected_minutes\tsip_response_description\n200\t8957\t318993.3333333333\tOK\n600\t476\t0.0\tBusy Everywhere\n603\t189\t231.6666666666666\tDeclined\n487\t162\t595.0\tRequest Terminated / Canceled\n486\t92\t6.666666666666667\tBusy Here\n404\t30\t0.0\tNot Found\n500\t14\t0.0\tServer Internal Error\n408\t14\t0.0\tRequest Timeout\n477\t8\t230.0\tTransport Layer Issue\n481\t4\t96.66666666666667\tCall or Transaction Doesn\u0027t Exist\n484\t4\t1.6666666666666667\tAddress Incomplete\n410\t2\t0.0\tGone\n480\t1\t1.6666666666666667\tTemporarily Unavailable\n"
+          },
+          {
+            "type": "TEXT",
+            "data": ""
+          }
+        ]
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "http://zeppelin:4040/jobs/job?id\u003d17",
+            "http://zeppelin:4040/jobs/job?id\u003d18"
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1564868919864_1006826993",
+      "id": "20190803-214839_1799814609",
+      "dateCreated": "2019-08-03 21:48:39.865",
+      "dateStarted": "2019-08-03 21:54:51.434",
+      "dateFinished": "2019-08-03 21:54:57.692",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "Signal2019/2_2_DataEngineering",
+  "id": "2EJ81GWDN",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {
+    "spark:shared_process": []
+  },
+  "config": {
+    "isZeppelinNotebookCronEnable": false
+  },
+  "info": {}
+}
